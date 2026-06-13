@@ -3,7 +3,7 @@
 Plugin multi-CLI que vigila buenas praxis en Next.js. Tras cada edición de archivo, un
 linter determinístico revisa el archivo y, si encuentra problemas, te inyecta un aviso
 `praxis-guard` (no bloquea). Reglas: `secrets`, `hardcoded-data`, `forbidden-imports`,
-`file-responsibility`. Config por proyecto en `.claude/nextjs-praxis-guard.json`.
+`file-responsibility`. Config por proyecto en `nextjs-praxis-guard.json` (raíz, CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
 
 Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de continuar.
 

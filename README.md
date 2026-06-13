@@ -67,10 +67,11 @@ node hooks/detect.mjs <archivo>
 ## Configuración
 
 La config base vive en `config/defaults.json`. Cada proyecto puede sobrescribirla con
-`.claude/nextjs-praxis-guard.json`, que se aplica por **deep-merge** sobre los defaults (solo
-declarás lo que cambiás).
+`nextjs-praxis-guard.json` en la raíz del proyecto (ruta CLI-agnóstica, recomendada), que se
+aplica por **deep-merge** sobre los defaults (solo declarás lo que cambiás). También se acepta
+`.claude/nextjs-praxis-guard.json` por compatibilidad con Claude Code.
 
-Ejemplo `.claude/nextjs-praxis-guard.json`:
+Ejemplo `nextjs-praxis-guard.json`:
 
 ```json
 {
