@@ -1,0 +1,14 @@
+# Plantillas con placeholders $(git rev-parse ...) que el installer reescribe a ruta absoluta
+cli/codex-hooks.json
+cli/copilot-hooks.json
+
+# Settings personales/locales de Claude (gitignored, no se distribuyen)
+.claude/**
+
+# Docs de planificación/spec: contienen código de ejemplo ilustrativo (incl. fixtures de muestra)
+docs/**
+.todo/**
+
+# Fixtures de test: contienen secretos FALSOS y malas praxis a propósito,
+# para que el detector tenga qué cazar. No son código distribuible.
+test/fixtures/**

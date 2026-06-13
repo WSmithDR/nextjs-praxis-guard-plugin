@@ -1,0 +1,12 @@
+{
+  "name": "nextjs-praxis-guard-plugin",
+  "version": "0.1.0",
+  "description": "Multi-CLI guard that warns on Next.js bad-praxis in files an AI agent writes.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node test/run.mjs",
+    "detect": "node hooks/detect.mjs"
+  }
+}

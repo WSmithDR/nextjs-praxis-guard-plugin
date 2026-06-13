@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "matcher": "edit|write|Edit|Write",
+        "bash": "node \"$(git rev-parse --show-toplevel)/hooks/hook-adapter.mjs\" --cli=copilot",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
