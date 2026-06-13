@@ -1,7 +1,7 @@
 // test/run.mjs — runs every *.test.mjs under test/, fails loudly on first error.
 import { readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { join, dirname } from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 
 function walk(dir, acc = []) {
   for (const name of readdirSync(dir)) {
@@ -12,7 +12,7 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-const root = new URL('.', import.meta.url).pathname;
+const root = dirname(fileURLToPath(import.meta.url));
 const files = walk(root);
 let failed = 0;
 for (const f of files) {
