@@ -5,6 +5,7 @@
     "secrets": { "enabled": true },
     "hardcoded-data": { "enabled": true, "minElements": 8 },
     "forbidden-imports": { "enabled": true, "list": [] },
-    "file-responsibility": { "enabled": true, "maxLines": 400, "mixedSignalsLines": 200 }
+    "file-responsibility": { "enabled": true, "maxLines": 400, "mixedSignalsLines": 200 },
+    "untranslated-text": { "enabled": true, "attributes": ["placeholder", "title", "alt", "aria-label", "label"], "ignore": [] }
   }
 }
