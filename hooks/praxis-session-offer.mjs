@@ -19,7 +19,7 @@ function isNextProject(cwd) {
 }
 
 function markerPath(cwd) {
-  const h = createHash('sha256').update(cwd).digest('hex').slice(0, 16);
+  const h = createHash('sha256').update(cwd).digest('hex');
   return join(tmpdir(), `praxis-guard-offered-${h}`);
 }
 
