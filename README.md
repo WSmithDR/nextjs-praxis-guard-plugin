@@ -5,7 +5,7 @@ proyectos Next.js. Tras cada edición de archivo que hace el agente, un linter d
 revisa el archivo recién escrito y, si encuentra problemas, inyecta un aviso `praxis-guard`
 en el contexto del agente para que corrija en el flujo. Nunca rompe la edición.
 
-## Las 4 reglas
+## Las 5 reglas
 
 | Regla | Qué detecta |
 |-------|-------------|
@@ -13,6 +13,7 @@ en el contexto del agente para que corrija en el flujo. Nunca rompe la edición.
 | `hardcoded-data` | Arrays grandes de datos de dominio embebidos en componentes `.tsx`/`.jsx` (listas de strings que deberían vivir en `config/`, `/lib` o la DB). El umbral por defecto es `minElements: 8`. |
 | `forbidden-imports` | Imports de módulos vetados por el proyecto. La lista es **por-proyecto y está vacía por defecto**: vos definís qué no querés ver. |
 | `file-responsibility` | Archivos demasiado largos (umbral de líneas) y un *nudge* de auto-reflexión cuando un mismo archivo mezcla *data fetching* con JSX (mezcla de responsabilidades). |
+| `untranslated-text` | Texto literal **visible** en componentes `.tsx`/`.jsx` sin interpolar — nodos JSX (`<button>Enviar</button>`) y atributos de UI (`placeholder`, `title`, `alt`, `aria-label`, `label` como `attr="texto"`). Entorpece la i18n / soporte multidioma: el texto debería pasar por una función como `{t('clave')}`. Ignora lo interpolado (`{t(...)}`, `{variable}`, `attr={...}`). Configurable: `attributes`, `ignore`. Si tu proyecto no hace i18n, desactivala con `"enabled": false`. |
 
 ## Cómo funciona
 
@@ -116,6 +117,10 @@ futura). Esto implica falsos negativos **conocidos y aceptados** — no son bugs
 - `secrets`: **saltea cualquier línea que contenga `process.env.`** (puede perderse un secreto en
   una línea que también tiene un fallback de env, p. ej. `KEY = process.env.X || "sk_live_…"`), y
   reporta como máximo **un secreto por línea**.
+- `untranslated-text`: solo ve **nodos de texto JSX** (`>texto<`) y atributos con comilla doble
+  (`attr="texto"`); no detecta texto mezclado con expresiones en el mismo nodo (`Hola {nombre}`),
+  atributos con comilla simple, ni texto fuera de JSX. Es la regla más ruidosa: si no hacés i18n,
+  desactivala.
 
 ## Tests
 
