@@ -98,11 +98,12 @@ Cuando el detector encuentra problemas, inyecta un bloque como este:
 ⚠️ praxis-guard — src/context/AppContext.tsx
   [warn] secrets:5 — Posible Stripe live secret key hardcodeado. Movelo a una env var (process.env.X) y a .env.local.
   [warn] hardcoded-data:3 — Array literal de 10 strings de dominio en un componente. Extraé a config/, una constante en /lib o la DB.
-  [info] file-responsibility:1 — El archivo mezcla data fetching y JSX. ¿Conviene separar la carga de datos de la presentación?
+  [info] file-responsibility — Mezcla fetching de datos + JSX + lógica en un archivo de 612 líneas. ¿Conviene separar responsabilidades (data layer / presentación)? Reflexioná antes de seguir.
 ```
 
-Cada línea es `[severity] regla:línea — mensaje`. `[warn]` señala algo a corregir;
-`[info]` es un *nudge* de auto-reflexión.
+Cada línea es `[severity] regla[:línea] — mensaje` (el número de línea aparece cuando la
+regla puede ubicar el problema; `file-responsibility` evalúa el archivo entero y lo omite).
+`[warn]` señala algo a corregir; `[info]` es un *nudge* de auto-reflexión.
 
 ## Límites conocidos (v1)
 
