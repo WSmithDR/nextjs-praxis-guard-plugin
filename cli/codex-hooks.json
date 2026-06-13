@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "apply_patch",
+        "hooks": [
+          { "type": "command", "timeout": 30,
+            "statusMessage": "praxis-guard lint",
+            "command": "node \"$(git rev-parse --show-toplevel)/hooks/hook-adapter.mjs\" --cli=codex" }
+        ]
+      }
+    ]
+  }
+}
