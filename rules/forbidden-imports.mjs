@@ -14,7 +14,7 @@ export default function forbiddenImports(content, _filePath, config = {}) {
     const source = m[1];
     for (const entry of list) {
       if (!entry || !entry.module) continue;
-      if (source === entry.module || source.includes(entry.module)) {
+      if (source === entry.module || source.startsWith(entry.module + '/')) {
         out.push({ rule: 'forbidden-imports', line: i + 1, severity: 'warn',
           message: `Import prohibido "${source}": ${entry.message || 'usá la alternativa del proyecto.'}` });
         break;

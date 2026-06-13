@@ -15,4 +15,10 @@ assert.equal(badF.length, 2, `expected 2, got ${badF.length}`);
 assert.ok(badF[0].message.includes('wrapper'));
 assert.equal(rule(good, 'ok.ts', cfg).length, 0);
 assert.equal(rule(bad, 'uses.ts', { enabled: true, list: [] }).length, 0);
+
+// regression: must not flag react-dom when only "react" is blocked
+const reactCfg = { enabled: true, list: [{ module: 'react', message: 'blocked' }] };
+assert.equal(rule('import X from "react-dom";', 'a.ts', reactCfg).length, 0, 'react-dom not flagged by react');
+assert.equal(rule('import X from "react";', 'a.ts', reactCfg).length, 1, 'exact react flagged');
+assert.equal(rule('import X from "react/jsx-runtime";', 'a.ts', reactCfg).length, 1, 'react subpath flagged');
 console.log('forbidden-imports.test ok');
