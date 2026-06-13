@@ -19,14 +19,14 @@ assert.equal(merged.rules.secrets.enabled, true, 'other rules kept');
 
 // --- CLI-agnostic project config path resolution ---
 
-// 1) None of the 3 files exist -> agnostic default (repo-root).
+// 1) None of the files exist -> canonical .praxis-guard default.
 {
   const dir = mkdtempSync(join(tmpdir(), 'praxis-cfg-none-'));
   try {
     assert.equal(
       defaultProjectConfigPath(dir),
-      join(dir, 'nextjs-praxis-guard.json'),
-      'no files present -> CLI-agnostic default',
+      join(dir, '.praxis-guard', 'config.json'),
+      'no files present -> canonical .praxis-guard default',
     );
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -86,5 +86,21 @@ assert.equal(merged.rules.secrets.enabled, true, 'other rules kept');
     rmSync(dir, { recursive: true, force: true });
   }
 }
+
+// .praxis-guard/config.json takes highest priority
+import { mkdtempSync as _mkdtemp2, mkdirSync as _mkdir2, writeFileSync as _write2, rmSync as _rm2 } from 'node:fs';
+import { tmpdir as _tmp2 } from 'node:os';
+import { join as _join2 } from 'node:path';
+
+const _d = _mkdtemp2(_join2(_tmp2(), 'praxis-prio-'));
+_mkdir2(_join2(_d, '.praxis-guard'));
+_write2(_join2(_d, '.praxis-guard', 'config.json'), '{}');
+_write2(_join2(_d, 'nextjs-praxis-guard.json'), '{}');
+assert.equal(defaultProjectConfigPath(_d), _join2(_d, '.praxis-guard', 'config.json'), '.praxis-guard wins over root file');
+
+const _empty = _mkdtemp2(_join2(_tmp2(), 'praxis-empty-'));
+assert.equal(defaultProjectConfigPath(_empty), _join2(_empty, '.praxis-guard', 'config.json'), 'default is the canonical .praxis-guard path');
+
+[_d, _empty].forEach((x) => _rm2(x, { recursive: true, force: true }));
 
 console.log('config.test ok');
