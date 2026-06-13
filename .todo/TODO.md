@@ -44,6 +44,14 @@
 
 ## Q4 — Backlog / futuro (NO en v1)
 
+- [ ] **Detección de drift de config al actualizar el plugin** — cuando una versión nueva
+      agrega (o quita/renombra) una regla, hoy se activa/desactiva sola sin avisar (la config
+      solo guarda diffs y el detector mergea sobre defaults). Falta: registrar en
+      `.praxis-guard/meta.json` qué reglas ya revisó el usuario (`reviewed_rules`) y, en el
+      hook SessionStart, comparar `reglas_actuales − reviewed` → ofrecer correr `praxis-config`
+      (modo editar) solo por las nuevas. Reusa meta.json + SessionStart + skill `praxis-config`.
+      Su propio ciclo spec → plan → impl.
+- [ ] Skill de auditoría de proyecto completo (usa `.praxis-guard/` como home; su propio ciclo).
 - [ ] Skills de conocimiento/convenciones Next.js.
 - [ ] Slash commands de scaffolding (`/new-module`, `/new-api-route`).
 - [ ] Auditorías on-demand (performance, a11y, SEO, bundle size).
