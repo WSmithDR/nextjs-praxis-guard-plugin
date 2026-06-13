@@ -15,3 +15,11 @@ Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de con
 - OpenCode: plugin `tool.execute.after` (`cli/opencode-plugin.mjs` → `.opencode/plugins/`).
 
 Para Copilot/Codex/OpenCode: `node bin/install-hooks.mjs --target <project> --cli <name>`.
+
+## Configuración por proyecto
+
+La config vive en `.praxis-guard/config.json` (committeala — es config de equipo). Para
+armarla o cambiarla de forma guiada, invocá la skill **`praxis-config`**: te pregunta qué
+reglas correr y con qué parámetros, y la escribe por vos (vía `bin/praxis-config.mjs`).
+En Claude Code, si un proyecto Next.js no tiene config, el hook SessionStart te lo ofrece
+una vez. En las otras CLIs, corré `praxis-config` a demanda.
