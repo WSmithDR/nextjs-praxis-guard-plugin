@@ -53,6 +53,10 @@ function structuralChanged(d, ref) {
   if (st == null) return true;                    // ante la duda, corré project rules
   return st.some((line) => /^[ADR]/.test(line));
 }
+function stagedFiles(d) {
+  const s = gitLines(d, ['diff', '--name-only', '--cached']) || [];
+  return s.map((p) => p.replace(/\\/g, '/')).filter((p) => isInScope(p, config));
+}
 
 function runFileRules(relPaths) {
   const findings = [];
@@ -92,10 +96,13 @@ const meta = readMeta(dir);
 const fp = rulesFingerprint(config);
 const ver = pluginVersion();
 const forceFull = process.argv.includes('--full');
+const staged = process.argv.includes('--staged');
 const sinceArg = arg('since', null);
 
 let mode, targets = null;
-if (forceFull) {
+if (staged) {
+  mode = 'staged'; targets = stagedFiles(dir);
+} else if (forceFull) {
   mode = 'full';
 } else if (sinceArg) {
   mode = 'incremental'; targets = diffFiles(dir, sinceArg);
@@ -112,6 +119,8 @@ if (mode === 'full') {
   const files = enumerateFiles(dir, config);
   findings = [...runFileRules(files), ...runProjectRules()];
   ranProject = true;
+} else if (mode === 'staged') {
+  findings = runFileRules(targets || []);
 } else {
   findings = runFileRules(targets);
   const ref = sinceArg || meta.last_audited_commit;
@@ -121,8 +130,20 @@ if (mode === 'full') {
 report(findings);
 console.log(`praxis-audit: modo ${mode}${ranProject ? ' (con project rules)' : ''}.`);
 
-// Avanzar el estado tras full/incremental.
-const h = head(dir);
-if (h) writeMeta(dir, { last_audited_commit: h, rules_fingerprint: fp, plugin_version: ver });
+// staged NO avanza el estado (el commit aún no ocurrió).
+if (mode !== 'staged') {
+  const h = head(dir);
+  if (h) writeMeta(dir, { last_audited_commit: h, rules_fingerprint: fp, plugin_version: ver });
+}
 
-process.exit(0);
+// Bloqueo de commit configurable.
+let exitCode = 0;
+if (mode === 'staged') {
+  const commitCfg = config.commit || {};
+  if (commitCfg.block) {
+    const rank = { info: 1, warn: 2, error: 3 };
+    const min = rank[commitCfg.minSeverity] || 2;
+    if (findings.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
+  }
+}
+process.exit(exitCode);
