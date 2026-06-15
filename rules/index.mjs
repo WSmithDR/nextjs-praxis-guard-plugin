@@ -17,6 +17,7 @@ import tsconfigStrictness from './tsconfig-strictness.mjs';
 import tailwindArbitraryValues from './tailwind-arbitrary-values.mjs';
 import tailwindClassnameBloat from './tailwind-classname-bloat.mjs';
 import tailwindConditionalConcat from './tailwind-conditional-concat.mjs';
+import tailwindDuplicateUtilities from './tailwind-duplicate-utilities.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -37,6 +38,7 @@ export const RULES = {
   'tailwind-arbitrary-values': tailwindArbitraryValues,
   'tailwind-classname-bloat': tailwindClassnameBloat,
   'tailwind-conditional-concat': tailwindConditionalConcat,
+  'tailwind-duplicate-utilities': tailwindDuplicateUtilities,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
