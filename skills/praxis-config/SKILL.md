@@ -18,12 +18,21 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
 
 2. **Preguntá al usuario** (en Claude Code podés usar la UI de opciones; en otros CLIs,
    en el chat). Cubrí, una cosa a la vez:
-   - Qué reglas activar/desactivar: `secrets`, `hardcoded-data`, `forbidden-imports`,
-     `file-responsibility`, `untranslated-text`.
+   - **Reglas de contenido** activar/desactivar: `secrets`, `hardcoded-data`,
+     `forbidden-imports`, `file-responsibility`, `untranslated-text`.
    - Umbrales: `file-responsibility.maxLines` (default 400) y `mixedSignalsLines` (200);
      `hardcoded-data.minElements` (8).
    - `forbidden-imports.list`: entradas `{ "module": "...", "message": "..." }`.
    - `untranslated-text`: on/off y `ignore` (textos permitidos).
+   - **Reglas de arquitectura** (opt-in, todas `enabled: false` por default): `folder-placement`,
+     `layer-boundaries`, `server-client-boundaries`, `feature-deps` (por-archivo) y
+     `architecture-coherence` (solo auditoría). **No corren** hasta declarar el bloque
+     `architecture.strategy` (`by-feature` | `by-layer`). Si el usuario quiere activarlas,
+     preguntá la estrategia y, según la regla: `folder-placement.placement[]`
+     (`{kind, match, allowed}`), `layer-boundaries.layers[]` (`{name, path, mayImport}`),
+     `server-client-boundaries.serverOnly[]`, `feature-deps.publicEntry[]`.
+   - **`commit`**: `{ check, block, minSeverity }` — controla el pre-commit (avisa por
+     default; `block: true` aborta el commit si hay findings ≥ `minSeverity`).
    En modo editar, preguntá SOLO qué quiere cambiar; respetá lo demás.
 
 3. **Construí el objeto config** declarando únicamente lo que difiere de los defaults
@@ -37,6 +46,6 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
 5. **Confirmá** al usuario qué quedó en `.praxis-guard/config.json` y recordale commitearlo.
 
 ## Reglas
-- No inventes ids de regla: solo las cinco de arriba.
-- El plugin nunca bloquea; esta config solo decide qué avisos ves.
+- No inventes ids de regla: solo las diez de arriba (5 de contenido + 5 de arquitectura).
+- El hook nunca bloquea; solo el pre-commit puede bloquear y únicamente con `commit.block: true`.
 - Si el usuario no quiere configurar nada, no escribas: el detector usa los defaults.

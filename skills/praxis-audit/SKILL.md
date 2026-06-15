@@ -1,0 +1,35 @@
+---
+name: praxis-audit
+description: Audita un proyecto Next.js completo con las reglas de praxis-guard. Decide solo entre auditoría completa (cambió la versión del plugin o el código/config de las reglas) y auditoría incremental (solo el diff de git desde la última corrida). Invocar cuando el usuario dice "auditá el proyecto", "corré praxis-audit", "revisá todo el repo", o quiere chequear malas praxis fuera del flujo archivo-por-archivo del hook.
+---
+
+# praxis-audit
+
+Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta el reporte.
+
+## Cómo correrlo
+
+- Auto (recomendado): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --dir <proyecto>`
+  - Completa si cambió `plugin_version` o `rules_fingerprint`, o si no hay `last_audited_commit`.
+  - Incremental (git diff desde `last_audited_commit`) en caso contrario.
+- Forzar completa: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --full --dir <proyecto>`
+- Desde un ref: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --since <ref> --dir <proyecto>`
+- Pre-commit (lo usa el hook git): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --staged --dir <proyecto>`
+
+## Proceso
+
+1. Correr el comando auto sobre la raíz del proyecto.
+2. Leer el reporte (findings agrupados por archivo + el modo usado).
+3. Presentarle al usuario los findings priorizados; si hay muchos, agrupar por regla.
+4. Si aparece un finding de arquitectura y el proyecto aún no declaró estrategia
+   (`architecture.strategy`), sugerir la skill `praxis-config`.
+
+## Estado
+
+El motor estampa en `.praxis-guard/meta.json`: `last_audited_commit`, `rules_fingerprint`,
+`plugin_version`. No tocar a mano. El modo `--staged` NO avanza ese estado (el commit aún no ocurrió).
+
+## Reglas
+- El motor nunca rompe la edición ni la sesión: exit 0 salvo el caso `--staged` con
+  `commit.block: true` y findings ≥ `commit.minSeverity` (aborta el commit).
+- Las reglas de arquitectura solo corren si el proyecto declaró `architecture.strategy`.
