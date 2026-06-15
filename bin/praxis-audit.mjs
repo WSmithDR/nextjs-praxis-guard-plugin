@@ -14,6 +14,7 @@ import { runDetector } from '../hooks/detect.mjs';
 import { PROJECT_RULES } from '../rules/index.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { readMeta, writeMeta } from '../lib/meta.mjs';
+import { detectStack } from '../lib/detect-stack.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,6 +28,7 @@ function arg(name, def) {
 
 const dir = resolve(arg('dir', process.cwd()));
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
+try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
 
 function pluginVersion() {
   try {
