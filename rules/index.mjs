@@ -11,6 +11,7 @@ import featureDeps from './feature-deps.mjs';
 import repeatedObjectShape from './repeated-object-shape.mjs';
 import stringlyTyped from './stringly-typed.mjs';
 import duplicateLiteralUnion from './duplicate-literal-union.mjs';
+import preferAsConst from './prefer-as-const.mjs';
 import architectureCoherence from './architecture-coherence.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
@@ -28,6 +29,7 @@ export const RULES = {
   'repeated-object-shape': repeatedObjectShape,
   'stringly-typed': stringlyTyped,
   'duplicate-literal-union': duplicateLiteralUnion,
+  'prefer-as-const': preferAsConst,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
