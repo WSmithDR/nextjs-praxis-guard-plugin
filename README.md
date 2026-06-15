@@ -29,6 +29,38 @@ layout no estándar.
 | `feature-deps` | por-archivo | Una feature que importa los **internos** de otra en vez de su API pública. |
 | `architecture-coherence` | proyecto | Incoherencia global con la estrategia (ej: `by-feature` pero hay un `src/components/` global). Solo corre en la auditoría. |
 
+## Reglas TypeScript (autodetect)
+
+Corren solo si el proyecto tiene `tsconfig.json`. **No duplican ESLint/tsc** (no cazan `any`,
+`@ts-ignore`, etc.): apuntan a las bondades de TS que se desaprovechan — reuso de tipos,
+unions/enums, `as const`.
+
+| Regla | Clase | Qué detecta |
+|-------|-------|-------------|
+| `repeated-object-shape` | por-archivo | El mismo shape de objeto literal repetido → extraé a `interface`/`type`. Config: `minProps`, `minRepeats`. |
+| `stringly-typed` | por-archivo | Un valor comparado contra varios strings fijos → union type o `enum`. Config: `minLiterals`. |
+| `duplicate-literal-union` | por-archivo | La misma union de literales escrita varias veces → nombrala una vez. Config: `minMembers`, `minRepeats`. |
+| `prefer-as-const` | por-archivo | Objeto-mapa de constantes sin `as const` (perdés el narrowing). |
+| `tsconfig-strictness` | proyecto | El `tsconfig` no fuerza el `baseline` de estrictez elegido (default `["strict","noImplicitAny"]`). Tiene fixer opt-in (abajo). |
+
+## Reglas Tailwind (autodetect)
+
+Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `className`.
+
+| Regla | Qué detecta |
+|-------|-------------|
+| `tailwind-arbitrary-values` | Valores arbitrarios `w-[473px]`, `text-[#3a3a3a]` que rompen el design system. Config: `allow`. |
+| `tailwind-classname-bloat` | `className` con más de `maxClasses` clases (default 12) → extraé a componente o `cva`. |
+| `tailwind-conditional-concat` | `className={'p-4 '+(x?'a':'')}` → usá `clsx`/`cn` (se rompe con el purge). |
+| `tailwind-duplicate-utilities` | Clases duplicadas o contradictorias (`p-2 p-4`, `flex block`). |
+
+### Fixer de tsconfig (opt-in)
+
+`node bin/praxis-audit.mjs --fix-tsconfig --dir <proyecto>` aplica el `baseline` de
+`tsconfig-strictness` a `compilerOptions`. Por seguridad, **solo escribe** si el `tsconfig.json`
+es JSON limpio sin `extends`; si tiene comentarios o `extends`, no toca el archivo y te lista
+los flags para agregar a mano. El flujo normal de `praxis-audit` nunca modifica `tsconfig.json`.
+
 ## Cómo funciona
 
 1. Cada CLI dispara un hook **post-edición** después de que el agente escribe/edita un archivo.

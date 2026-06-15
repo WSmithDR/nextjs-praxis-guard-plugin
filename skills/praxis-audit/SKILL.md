@@ -15,6 +15,9 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
 - Forzar completa: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --full --dir <proyecto>`
 - Desde un ref: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --since <ref> --dir <proyecto>`
 - Pre-commit (lo usa el hook git): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --staged --dir <proyecto>`
+- Arreglar tsconfig (opt-in): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --fix-tsconfig --dir <proyecto>`
+  - Aplica el `baseline` de `tsconfig-strictness` a `compilerOptions`. Solo escribe si el
+    `tsconfig.json` es JSON limpio sin `extends`; si no, lista los flags para agregar a mano.
 
 ## Proceso
 

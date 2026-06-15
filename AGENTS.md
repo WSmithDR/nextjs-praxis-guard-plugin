@@ -6,8 +6,13 @@ linter determinístico revisa el archivo y, si encuentra problemas, te inyecta u
 `forbidden-imports`, `file-responsibility`, `untranslated-text`. Reglas de arquitectura
 (opt-in, requieren declarar `architecture.strategy`): `folder-placement`, `layer-boundaries`,
 `server-client-boundaries`, `feature-deps` (por-archivo) y `architecture-coherence` (solo
-auditoría). Config por proyecto en `nextjs-praxis-guard.json` (raíz, CLI-agnóstica), con
-`.claude/nextjs-praxis-guard.json` como fallback.
+auditoría). Reglas TypeScript (autodetect si hay `tsconfig.json`; aprovechamiento de tipos, no
+duplican ESLint): `repeated-object-shape`, `stringly-typed`, `duplicate-literal-union`,
+`prefer-as-const` (por-archivo) y `tsconfig-strictness` (auditoría, con fixer
+`praxis-audit --fix-tsconfig`). Reglas Tailwind (autodetect si hay `tailwind.config.*`):
+`tailwind-arbitrary-values`, `tailwind-classname-bloat`, `tailwind-conditional-concat`,
+`tailwind-duplicate-utilities`. Config por proyecto en `nextjs-praxis-guard.json` (raíz,
+CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
 
 Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de continuar.
 
