@@ -21,7 +21,7 @@ export function runDetector(filePath, { content, config } = {}) {
     const ruleCfg = (cfg.rules && cfg.rules[id]) || {};
     if (ruleCfg.enabled === false) continue;
     try {
-      const res = fn(src, filePath, ruleCfg);
+      const res = fn(src, filePath, ruleCfg, cfg);
       if (Array.isArray(res)) findings.push(...res);
     } catch { /* a broken rule never breaks detection */ }
   }

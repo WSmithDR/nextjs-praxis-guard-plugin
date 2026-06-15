@@ -1,7 +1,7 @@
 // bin/install-hooks.mjs
 // Wires the non-auto-loading CLIs (copilot|codex|opencode) into a target project,
 // rewriting the path to this plugin's hooks so the hook can find detect.mjs.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, chmodSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -44,7 +44,18 @@ switch (cli) {
     console.log(`installed opencode plugin -> ${dest}`);
     break;
   }
+  case 'precommit': {
+    const hooksDir = join(target, '.git', 'hooks');
+    mkdirSync(hooksDir, { recursive: true });
+    const audit = join(PLUGIN_ROOT, 'bin', 'praxis-audit.mjs');
+    const dest = join(hooksDir, 'pre-commit');
+    const body = `#!/bin/sh\n# praxis-guard pre-commit (auto-instalado)\nnode ${JSON.stringify(audit)} --staged --dir "$(git rev-parse --show-toplevel)"\n`;
+    writeFileSync(dest, body);
+    chmodSync(dest, 0o755);
+    console.log(`installed pre-commit hook -> ${dest}`);
+    break;
+  }
   default:
-    console.error('usage: node bin/install-hooks.mjs --target <dir> --cli <copilot|codex|opencode>');
+    console.error('usage: node bin/install-hooks.mjs --target <dir> --cli <copilot|codex|opencode|precommit>');
     process.exit(1);
 }

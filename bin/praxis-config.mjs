@@ -9,6 +9,10 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { validateConfig } from '../lib/validate-config.mjs';
+import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
+import { rulesFingerprint } from '../lib/fingerprint.mjs';
+import { writeMeta } from '../lib/meta.mjs';
+import { RULES, PROJECT_RULES } from '../rules/index.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -68,12 +72,15 @@ if (cmd === 'write') {
   if (!ok) { console.error('praxis-config: config inválida:\n  - ' + errors.join('\n  - ')); process.exit(1); }
   mkdirSync(configDir, { recursive: true });
   writeAtomic(configPath, JSON.stringify(obj, null, 2) + '\n');
-  writeAtomic(metaPath, JSON.stringify({
+  const merged = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir), override: obj });
+  writeMeta(dir, {
     configured_by: gitUser(dir),
     configured_at: new Date().toISOString().slice(0, 10),
     plugin_version: pluginVersion(),
     schema_version: 1,
-  }, null, 2) + '\n');
+    reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES)].sort(),
+    rules_fingerprint: rulesFingerprint(merged),
+  });
   console.log(`praxis-config: escrito ${configPath}`);
   process.exit(0);
 }

@@ -18,6 +18,10 @@ assert.equal(cfg.rules['file-responsibility'].maxLines, 250);
 const meta = JSON.parse(readFileSync(join(dir, '.praxis-guard', 'meta.json'), 'utf8'));
 assert.ok(meta.configured_at && meta.plugin_version, 'meta stamped');
 assert.equal(meta.schema_version, 1);
+assert.ok(Array.isArray(meta.reviewed_rules) && meta.reviewed_rules.includes('secrets'),
+  'reviewed_rules debe incluir las reglas registradas');
+assert.ok(typeof meta.rules_fingerprint === 'string' && meta.rules_fingerprint.startsWith('sha256:'),
+  'rules_fingerprint presente');
 
 assert.ok(run(['show', '--dir', dir]).includes('250'));
 

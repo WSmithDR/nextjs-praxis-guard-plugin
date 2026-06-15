@@ -25,4 +25,33 @@ assert.equal(validateConfig({ rules: { 'untranslated-text': { ignore: 'Enviar' }
 
 assert.equal(validateConfig(null).ok, false);
 assert.equal(validateConfig([]).ok, false);
+
+// --- arquitectura + reglas nuevas + commit ---
+{
+  const ok = validateConfig({
+    architecture: { strategy: 'by-feature', root: 'src', featuresDir: 'src/features', sharedDirs: ['src/shared'] },
+    rules: {
+      'folder-placement': { enabled: true, placement: [{ kind: 'hook', match: '^use[A-Z]', allowed: ['**/hooks/**'] }] },
+      'layer-boundaries': { enabled: true, layers: [{ name: 'domain', path: 'src/domain', mayImport: [] }] },
+      'feature-deps': { enabled: false, publicEntry: ['index.ts'] },
+      'server-client-boundaries': { enabled: false, serverOnly: ['server-only'] },
+      'architecture-coherence': { enabled: false },
+    },
+    commit: { check: true, block: false, minSeverity: 'warn' },
+  });
+  assert.equal(ok.ok, true, JSON.stringify(ok.errors));
+}
+{
+  const bad = validateConfig({ architecture: { strategy: 'nope' } });
+  assert.equal(bad.ok, false);
+}
+{
+  const bad = validateConfig({ rules: { 'layer-boundaries': { layers: 'x' } } });
+  assert.equal(bad.ok, false);
+}
+{
+  const bad = validateConfig({ commit: { minSeverity: 'fatal' } });
+  assert.equal(bad.ok, false);
+}
+console.log('validate-config arch cases ok');
 console.log('validate-config.test ok');

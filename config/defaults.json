@@ -1,11 +1,23 @@
 {
   "include": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
   "exclude": ["node_modules/", ".next/", "dist/", "build/", ".git/", "coverage/"],
+  "architecture": {
+    "strategy": null,
+    "root": "src",
+    "featuresDir": "src/features",
+    "sharedDirs": ["src/shared", "src/lib"]
+  },
+  "commit": { "check": true, "block": false, "minSeverity": "warn" },
   "rules": {
     "secrets": { "enabled": true },
     "hardcoded-data": { "enabled": true, "minElements": 8 },
     "forbidden-imports": { "enabled": true, "list": [] },
     "file-responsibility": { "enabled": true, "maxLines": 400, "mixedSignalsLines": 200 },
-    "untranslated-text": { "enabled": true, "attributes": ["placeholder", "title", "alt", "aria-label", "label"], "ignore": [] }
+    "untranslated-text": { "enabled": true, "attributes": ["placeholder", "title", "alt", "aria-label", "label"], "ignore": [] },
+    "folder-placement": { "enabled": false, "placement": [] },
+    "architecture-coherence": { "enabled": false },
+    "layer-boundaries": { "enabled": false, "layers": [] },
+    "server-client-boundaries": { "enabled": false, "serverOnly": ["server-only", "next/headers", "fs", "node:fs", "node:fs/promises", "node:crypto"] },
+    "feature-deps": { "enabled": false, "publicEntry": ["index.ts", "index.tsx"] }
   }
 }
