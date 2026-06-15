@@ -2,8 +2,12 @@
 
 Plugin multi-CLI que vigila buenas praxis en Next.js. Tras cada edición de archivo, un
 linter determinístico revisa el archivo y, si encuentra problemas, te inyecta un aviso
-`praxis-guard` (no bloquea). Reglas: `secrets`, `hardcoded-data`, `forbidden-imports`,
-`file-responsibility`, `untranslated-text`. Config por proyecto en `nextjs-praxis-guard.json` (raíz, CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
+`praxis-guard` (no bloquea). Reglas de contenido: `secrets`, `hardcoded-data`,
+`forbidden-imports`, `file-responsibility`, `untranslated-text`. Reglas de arquitectura
+(opt-in, requieren declarar `architecture.strategy`): `folder-placement`, `layer-boundaries`,
+`server-client-boundaries`, `feature-deps` (por-archivo) y `architecture-coherence` (solo
+auditoría). Config por proyecto en `nextjs-praxis-guard.json` (raíz, CLI-agnóstica), con
+`.claude/nextjs-praxis-guard.json` como fallback.
 
 Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de continuar.
 
@@ -15,6 +19,19 @@ Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de con
 - OpenCode: plugin `tool.execute.after` (`cli/opencode-plugin.mjs` → `.opencode/plugins/`).
 
 Para Copilot/Codex/OpenCode: `node bin/install-hooks.mjs --target <project> --cli <name>`.
+Para el git pre-commit: `--cli precommit` (corre `praxis-audit --staged`).
+
+## Auditoría de proyecto
+
+Además del hook por-archivo, `praxis-audit` audita el repo completo. Invocá la skill
+**`praxis-audit`** (o `node bin/praxis-audit.mjs`). Decide sola:
+- versión del plugin o código/config de reglas cambió → auditoría **completa**;
+- si no → **incremental** sobre el git diff desde el último commit auditado.
+
+El estado vive en `.praxis-guard/meta.json` (`last_audited_commit`, `rules_fingerprint`,
+`plugin_version`, `reviewed_rules`). Si aparecen reglas sin revisar, el hook `SessionStart`
+te ofrece correr `praxis-config`. El pre-commit por default **avisa sin bloquear**; activá
+el bloqueo con `"commit": { "block": true, "minSeverity": "warn" }`.
 
 ## Configuración por proyecto
 

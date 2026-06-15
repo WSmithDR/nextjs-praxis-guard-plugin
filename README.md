@@ -5,7 +5,7 @@ proyectos Next.js. Tras cada edición de archivo que hace el agente, un linter d
 revisa el archivo recién escrito y, si encuentra problemas, inyecta un aviso `praxis-guard`
 en el contexto del agente para que corrija en el flujo. Nunca rompe la edición.
 
-## Las 5 reglas
+## Reglas de contenido
 
 | Regla | Qué detecta |
 |-------|-------------|
@@ -14,6 +14,20 @@ en el contexto del agente para que corrija en el flujo. Nunca rompe la edición.
 | `forbidden-imports` | Imports de módulos vetados por el proyecto. La lista es **por-proyecto y está vacía por defecto**: vos definís qué no querés ver. |
 | `file-responsibility` | Archivos demasiado largos (umbral de líneas) y un *nudge* de auto-reflexión cuando un mismo archivo mezcla *data fetching* con JSX (mezcla de responsabilidades). |
 | `untranslated-text` | Texto literal **visible** en componentes `.tsx`/`.jsx` sin interpolar — nodos JSX (`<button>Enviar</button>`) y atributos de UI (`placeholder`, `title`, `alt`, `aria-label`, `label` como `attr="texto"`). Entorpece la i18n / soporte multidioma: el texto debería pasar por una función como `{t('clave')}`. Ignora lo interpolado (`{t(...)}`, `{variable}`, `attr={...}`). Configurable: `attributes`, `ignore`. Si tu proyecto no hace i18n, desactivala con `"enabled": false`. |
+
+## Reglas de arquitectura (opt-in)
+
+Todas vienen **`enabled: false`** y **no corren** hasta declarar `architecture.strategy`
+(`by-feature` | `by-layer`) en la config. Así no tiran falsos positivos en proyectos con
+layout no estándar.
+
+| Regla | Clase | Qué detecta |
+|-------|-------|-------------|
+| `folder-placement` | por-archivo | Un tipo de archivo fuera de su carpeta permitida (mapping configurable `kind`→globs: hooks en `**/hooks/**`, server actions en `**/_actions/**`, …). |
+| `layer-boundaries` | por-archivo | Imports que violan la dirección permitida entre capas (ej: `domain` no puede importar de `infra`/`ui`). |
+| `server-client-boundaries` | por-archivo | Un client component (`'use client'`) que importa módulos server-only (`next/headers`, `node:*`, …). |
+| `feature-deps` | por-archivo | Una feature que importa los **internos** de otra en vez de su API pública. |
+| `architecture-coherence` | proyecto | Incoherencia global con la estrategia (ej: `by-feature` pero hay un `src/components/` global). Solo corre en la auditoría. |
 
 ## Cómo funciona
 
@@ -42,7 +56,7 @@ los hooks.
 Estos CLIs no auto-cargan: instalalos apuntando a tu proyecto.
 
 ```bash
-node bin/install-hooks.mjs --target <proyecto> --cli <codex|copilot|opencode>
+node bin/install-hooks.mjs --target <proyecto> --cli <codex|copilot|opencode|precommit>
 ```
 
 Dónde cae cada archivo en `<proyecto>`:
@@ -52,6 +66,7 @@ Dónde cae cada archivo en `<proyecto>`:
 | `codex` | `.codex/hooks.json` |
 | `copilot` | `.github/hooks/praxis-guard.json` |
 | `opencode` | `.opencode/plugins/praxis-guard.mjs` |
+| `precommit` | `.git/hooks/pre-commit` (corre `praxis-audit --staged`) |
 
 > **Caveat OpenCode:** por ahora los avisos se emiten al *log stream* de OpenCode
 > (`client.app.log`). La re-inyección al contexto del agente **está sin verificar**.
@@ -64,6 +79,39 @@ si está limpio) y siempre sale con exit 0. Útil para CI o prueba manual.
 ```bash
 node hooks/detect.mjs <archivo>
 ```
+
+## Auditoría de proyecto completo
+
+El hook reacciona archivo por archivo. Para auditar el repo **entero** (incluyendo archivos
+que nadie tocó) está `bin/praxis-audit.mjs` — o la skill **`praxis-audit`** como envoltorio
+conversacional. Decide solo el modo:
+
+- **Completa** si cambió la versión del plugin o el `rules_fingerprint` (código/config de las
+  reglas), o si nunca se auditó.
+- **Incremental** (solo el `git diff` desde el último commit auditado) en caso contrario.
+
+```bash
+node bin/praxis-audit.mjs --dir <proyecto>          # auto (full o incremental)
+node bin/praxis-audit.mjs --full --dir <proyecto>   # forzar completa
+node bin/praxis-audit.mjs --since <ref> --dir <p>   # incremental desde un ref
+node bin/praxis-audit.mjs --staged --dir <proyecto> # solo lo staged (pre-commit)
+```
+
+El estado se guarda en `.praxis-guard/meta.json` (`last_audited_commit`, `rules_fingerprint`,
+`plugin_version`, `reviewed_rules`). Si una versión del plugin agrega reglas nuevas, el hook
+`SessionStart` te avisa de las que quedaron **sin revisar** y te sugiere correr `praxis-config`.
+
+### Pre-commit
+
+`node bin/install-hooks.mjs --target <proyecto> --cli precommit` instala un git `pre-commit`
+que corre `praxis-audit --staged`. Por **default avisa sin bloquear**; para que aborte el
+commit, poné en la config:
+
+```json
+{ "commit": { "block": true, "minSeverity": "warn" } }
+```
+
+(se saltea con `git commit --no-verify`).
 
 ## Configuración
 
@@ -99,6 +147,35 @@ Ejemplo `nextjs-praxis-guard.json`:
 
 Eso baja el umbral de `file-responsibility` a 300 líneas, deshabilita `hardcoded-data` y veta
 dos módulos en `forbidden-imports`.
+
+Para activar reglas de arquitectura, declarás la estrategia y configurás cada regla:
+
+```json
+{
+  "architecture": {
+    "strategy": "by-layer",
+    "root": "src",
+    "featuresDir": "src/features",
+    "sharedDirs": ["src/shared", "src/lib"]
+  },
+  "rules": {
+    "layer-boundaries": {
+      "enabled": true,
+      "layers": [
+        { "name": "domain", "path": "src/domain", "mayImport": [] },
+        { "name": "infra",  "path": "src/infra",  "mayImport": ["domain"] },
+        { "name": "ui",     "path": "src/ui",     "mayImport": ["domain", "infra"] }
+      ]
+    },
+    "folder-placement": {
+      "enabled": true,
+      "placement": [
+        { "kind": "hook", "match": "^use[A-Z]", "allowed": ["**/hooks/**"] }
+      ]
+    }
+  }
+}
+```
 
 ## Cómo leer un aviso
 
