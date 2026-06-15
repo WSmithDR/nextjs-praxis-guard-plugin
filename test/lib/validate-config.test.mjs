@@ -54,4 +54,23 @@ assert.equal(validateConfig([]).ok, false);
   assert.equal(bad.ok, false);
 }
 console.log('validate-config arch cases ok');
+// --- reglas TS + Tailwind ---
+{
+  const ok = validateConfig({ rules: {
+    'repeated-object-shape': { enabled: true, minProps: 2, minRepeats: 2 },
+    'stringly-typed': { enabled: true, minLiterals: 2 },
+    'duplicate-literal-union': { enabled: true, minMembers: 2, minRepeats: 2 },
+    'prefer-as-const': { enabled: false },
+    'tsconfig-strictness': { enabled: true, baseline: ['strict', 'noImplicitAny'] },
+    'tailwind-arbitrary-values': { enabled: true, allow: ['grid-cols-'] },
+    'tailwind-classname-bloat': { enabled: true, maxClasses: 12 },
+    'tailwind-conditional-concat': { enabled: true },
+    'tailwind-duplicate-utilities': { enabled: true },
+  }});
+  assert.equal(ok.ok, true, JSON.stringify(ok.errors));
+}
+assert.equal(validateConfig({ rules: { 'tsconfig-strictness': { baseline: 'strict' } } }).ok, false);
+assert.equal(validateConfig({ rules: { 'tailwind-classname-bloat': { maxClasses: '12' } } }).ok, false);
+assert.equal(validateConfig({ rules: { 'tailwind-arbitrary-values': { allow: 'x' } } }).ok, false);
+console.log('validate-config ts/tailwind cases ok');
 console.log('validate-config.test ok');

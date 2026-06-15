@@ -31,6 +31,14 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
      preguntá la estrategia y, según la regla: `folder-placement.placement[]`
      (`{kind, match, allowed}`), `layer-boundaries.layers[]` (`{name, path, mayImport}`),
      `server-client-boundaries.serverOnly[]`, `feature-deps.publicEntry[]`.
+   - **Reglas TypeScript** (autodetect si hay `tsconfig.json`; apuntan al aprovechamiento de
+     tipos, NO duplican ESLint): `repeated-object-shape` (`minProps`/`minRepeats`),
+     `stringly-typed` (`minLiterals`), `duplicate-literal-union` (`minMembers`/`minRepeats`),
+     `prefer-as-const`, y `tsconfig-strictness` (`baseline`: flags a exigir, ej.
+     `["strict","noImplicitAny"]`).
+   - **Reglas Tailwind** (autodetect si hay `tailwind.config.*`): `tailwind-arbitrary-values`
+     (`allow`), `tailwind-classname-bloat` (`maxClasses`), `tailwind-conditional-concat`,
+     `tailwind-duplicate-utilities`.
    - **`commit`**: `{ check, block, minSeverity }` — controla el pre-commit (avisa por
      default; `block: true` aborta el commit si hay findings ≥ `minSeverity`).
    En modo editar, preguntá SOLO qué quiere cambiar; respetá lo demás.
@@ -46,6 +54,6 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
 5. **Confirmá** al usuario qué quedó en `.praxis-guard/config.json` y recordale commitearlo.
 
 ## Reglas
-- No inventes ids de regla: solo las diez de arriba (5 de contenido + 5 de arquitectura).
+- No inventes ids de regla: las del catálogo (contenido, arquitectura, TypeScript, Tailwind).
 - El hook nunca bloquea; solo el pre-commit puede bloquear y únicamente con `commit.block: true`.
 - Si el usuario no quiere configurar nada, no escribas: el detector usa los defaults.

@@ -4,10 +4,14 @@ import { RULES } from '../rules/index.mjs';
 import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { isInScope } from '../lib/scope.mjs';
 import { formatFindings } from '../lib/findings.mjs';
+import { detectStack } from '../lib/detect-stack.mjs';
 
 // runDetector(filePath, { content?, config? }) -> { findings, text }
 export function runDetector(filePath, { content, config } = {}) {
   const cfg = config || loadConfig({ projectConfigPath: defaultProjectConfigPath() });
+  if (!cfg.detected) {
+    try { cfg.detected = detectStack(process.cwd()); } catch { cfg.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
+  }
   if (!isInScope(filePath, cfg)) return { findings: [], text: '' };
 
   let src = content;

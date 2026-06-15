@@ -18,6 +18,15 @@
     "architecture-coherence": { "enabled": false },
     "layer-boundaries": { "enabled": false, "layers": [] },
     "server-client-boundaries": { "enabled": false, "serverOnly": ["server-only", "next/headers", "fs", "node:fs", "node:fs/promises", "node:crypto"] },
-    "feature-deps": { "enabled": false, "publicEntry": ["index.ts", "index.tsx"] }
+    "feature-deps": { "enabled": false, "publicEntry": ["index.ts", "index.tsx"] },
+    "repeated-object-shape": { "enabled": true, "minProps": 2, "minRepeats": 2 },
+    "stringly-typed": { "enabled": true, "minLiterals": 2 },
+    "duplicate-literal-union": { "enabled": true, "minMembers": 2, "minRepeats": 2 },
+    "prefer-as-const": { "enabled": true },
+    "tsconfig-strictness": { "enabled": true, "baseline": ["strict", "noImplicitAny"] },
+    "tailwind-arbitrary-values": { "enabled": true, "allow": [] },
+    "tailwind-classname-bloat": { "enabled": true, "maxClasses": 12 },
+    "tailwind-conditional-concat": { "enabled": true },
+    "tailwind-duplicate-utilities": { "enabled": true }
   }
 }

@@ -14,6 +14,8 @@ import { runDetector } from '../hooks/detect.mjs';
 import { PROJECT_RULES } from '../rules/index.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { readMeta, writeMeta } from '../lib/meta.mjs';
+import { detectStack } from '../lib/detect-stack.mjs';
+import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -27,6 +29,30 @@ function arg(name, def) {
 
 const dir = resolve(arg('dir', process.cwd()));
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
+try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
+
+if (process.argv.includes('--fix-tsconfig')) {
+  const det = config.detected || {};
+  const baseline = (config.rules && config.rules['tsconfig-strictness'] && config.rules['tsconfig-strictness'].baseline) || ['strict', 'noImplicitAny'];
+  if (!det.typescript || !det.tsconfigPath) {
+    console.log('praxis-audit: no hay tsconfig.json para arreglar.');
+    process.exit(0);
+  }
+  const missing = computeMissing(det.tsconfigOptions, baseline);
+  if (missing.length === 0) {
+    console.log('praxis-audit: tsconfig ya cumple el baseline ✅');
+    process.exit(0);
+  }
+  if (!det.tsconfigFixable) {
+    console.log(`praxis-audit: tsconfig.json no es auto-fixable (tiene comentarios o "extends"). Agregá estos flags a mano en compilerOptions: ${missing.join(', ')}`);
+    process.exit(0);
+  }
+  const res = applyFix(det.tsconfigPath, baseline);
+  console.log(res.written
+    ? `praxis-audit: tsconfig.json actualizado — agregados: ${res.missing.join(', ')}`
+    : 'praxis-audit: nada que cambiar en tsconfig.json.');
+  process.exit(0);
+}
 
 function pluginVersion() {
   try {
