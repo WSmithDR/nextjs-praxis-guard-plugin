@@ -7,6 +7,7 @@ import untranslatedText from './untranslated-text.mjs';
 import folderPlacement from './folder-placement.mjs';
 import layerBoundaries from './layer-boundaries.mjs';
 import serverClientBoundaries from './server-client-boundaries.mjs';
+import featureDeps from './feature-deps.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -19,6 +20,7 @@ export const RULES = {
   'folder-placement': folderPlacement,
   'layer-boundaries': layerBoundaries,
   'server-client-boundaries': serverClientBoundaries,
+  'feature-deps': featureDeps,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
