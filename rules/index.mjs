@@ -10,6 +10,7 @@ import serverClientBoundaries from './server-client-boundaries.mjs';
 import featureDeps from './feature-deps.mjs';
 import repeatedObjectShape from './repeated-object-shape.mjs';
 import stringlyTyped from './stringly-typed.mjs';
+import duplicateLiteralUnion from './duplicate-literal-union.mjs';
 import architectureCoherence from './architecture-coherence.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
@@ -26,6 +27,7 @@ export const RULES = {
   'feature-deps': featureDeps,
   'repeated-object-shape': repeatedObjectShape,
   'stringly-typed': stringlyTyped,
+  'duplicate-literal-union': duplicateLiteralUnion,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
