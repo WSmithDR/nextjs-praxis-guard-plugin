@@ -16,6 +16,7 @@ import architectureCoherence from './architecture-coherence.mjs';
 import tsconfigStrictness from './tsconfig-strictness.mjs';
 import tailwindArbitraryValues from './tailwind-arbitrary-values.mjs';
 import tailwindClassnameBloat from './tailwind-classname-bloat.mjs';
+import tailwindConditionalConcat from './tailwind-conditional-concat.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -35,6 +36,7 @@ export const RULES = {
   'prefer-as-const': preferAsConst,
   'tailwind-arbitrary-values': tailwindArbitraryValues,
   'tailwind-classname-bloat': tailwindClassnameBloat,
+  'tailwind-conditional-concat': tailwindConditionalConcat,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
