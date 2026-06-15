@@ -5,6 +5,7 @@ import forbiddenImports from './forbidden-imports.mjs';
 import fileResponsibility from './file-responsibility.mjs';
 import untranslatedText from './untranslated-text.mjs';
 import folderPlacement from './folder-placement.mjs';
+import layerBoundaries from './layer-boundaries.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -15,6 +16,7 @@ export const RULES = {
   'file-responsibility': fileResponsibility,
   'untranslated-text': untranslatedText,
   'folder-placement': folderPlacement,
+  'layer-boundaries': layerBoundaries,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
