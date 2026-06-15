@@ -9,6 +9,7 @@ import layerBoundaries from './layer-boundaries.mjs';
 import serverClientBoundaries from './server-client-boundaries.mjs';
 import featureDeps from './feature-deps.mjs';
 import repeatedObjectShape from './repeated-object-shape.mjs';
+import stringlyTyped from './stringly-typed.mjs';
 import architectureCoherence from './architecture-coherence.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
@@ -24,6 +25,7 @@ export const RULES = {
   'server-client-boundaries': serverClientBoundaries,
   'feature-deps': featureDeps,
   'repeated-object-shape': repeatedObjectShape,
+  'stringly-typed': stringlyTyped,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
