@@ -13,6 +13,7 @@ import stringlyTyped from './stringly-typed.mjs';
 import duplicateLiteralUnion from './duplicate-literal-union.mjs';
 import preferAsConst from './prefer-as-const.mjs';
 import architectureCoherence from './architecture-coherence.mjs';
+import tsconfigStrictness from './tsconfig-strictness.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -36,4 +37,5 @@ export const RULES = {
 // Corren SOLO en la auditoría (miran el árbol del proyecto).
 export const PROJECT_RULES = {
   'architecture-coherence': architectureCoherence,
+  'tsconfig-strictness': tsconfigStrictness,
 };
