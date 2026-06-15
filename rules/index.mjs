@@ -15,6 +15,7 @@ import preferAsConst from './prefer-as-const.mjs';
 import architectureCoherence from './architecture-coherence.mjs';
 import tsconfigStrictness from './tsconfig-strictness.mjs';
 import tailwindArbitraryValues from './tailwind-arbitrary-values.mjs';
+import tailwindClassnameBloat from './tailwind-classname-bloat.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -33,6 +34,7 @@ export const RULES = {
   'duplicate-literal-union': duplicateLiteralUnion,
   'prefer-as-const': preferAsConst,
   'tailwind-arbitrary-values': tailwindArbitraryValues,
+  'tailwind-classname-bloat': tailwindClassnameBloat,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
