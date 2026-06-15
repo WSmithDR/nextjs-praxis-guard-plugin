@@ -4,6 +4,7 @@ import hardcodedData from './hardcoded-data.mjs';
 import forbiddenImports from './forbidden-imports.mjs';
 import fileResponsibility from './file-responsibility.mjs';
 import untranslatedText from './untranslated-text.mjs';
+import folderPlacement from './folder-placement.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -13,6 +14,7 @@ export const RULES = {
   'forbidden-imports': forbiddenImports,
   'file-responsibility': fileResponsibility,
   'untranslated-text': untranslatedText,
+  'folder-placement': folderPlacement,
 };
 
 // Project rules: (projectTree, fullConfig) => Finding[]
