@@ -1,0 +1,6 @@
+# Completados — nextjs-praxis-guard-plugin
+
+_Última actualización: 2026-06-15_
+
+- [x] **Drift de config al actualizar el plugin** — cuando una versión nueva agrega, quita o renombra una regla, esa regla se activa o desactiva sola sin avisar; el usuario nunca decide sobre la regla nueva. _(creado por: SmithDR · 2026-06-13)_ ✓ _resuelto: Recomendación A — `praxis-config` estampa `reviewed_rules` + `rules_fingerprint` + `plugin_version` en `.praxis-guard/meta.json`; el hook `SessionStart` compara las reglas registradas contra `reviewed_rules` y avisa de las no revisadas (solo si meta tiene el snapshot, no molesta a configs legacy). Merge feat/architecture-rules-and-audit — responsable: SmithDR · 2026-06-15_
+- [x] **Skill de auditoría de proyecto completo** — el plugin solo reaccionaba archivo por archivo (hook `PostToolUse`); no había forma de auditar un proyecto YA existente de una pasada. _(creado por: SmithDR · 2026-06-13)_ ✓ _resuelto: Recomendación B+A+C — motor determinista `bin/praxis-audit.mjs` (reusa `runDetector` + corre las project rules) con la skill `praxis-audit` como envoltorio; disparadores: versión/`rules_fingerprint` cambió → full, si no → incremental por git diff desde `last_audited_commit` (Opción C aplicada al trigger). Flags `--full`/`--staged`/`--since`. Merge feat/architecture-rules-and-audit — responsable: SmithDR · 2026-06-15_
