@@ -315,3 +315,27 @@ futura). Esto implica falsos negativos **conocidos y aceptados** — no son bugs
 ```bash
 npm test
 ```
+
+## Desarrollo: versionado automático
+
+Un hook `post-commit` bumpea la versión de `.claude-plugin/plugin.json` en cada commit, según el
+prefijo del mensaje (conventional commits) — y mete el cambio en el **mismo** commit (amend):
+
+| Prefijo | Bump |
+|---------|------|
+| `feat:` | minor |
+| `fix:` / `chore:` / `docs:` / `refactor:` / `test:` / `ci:` / … | patch |
+| `feat!:` o `BREAKING CHANGE` | major |
+
+Instalalo una vez (instala **solo** `post-commit`, no toca el `pre-commit` del todo-plugin):
+
+```bash
+bash bin/dev/setup.sh
+```
+
+Notas:
+- Bumpea en **cada** commit (no por release). Si un commit ya toca `plugin.json` a mano, lo saltea.
+- El guard de recursión (sentinel `.git/.version-bump-in-progress`) garantiza un único bump por commit
+  aunque el `amend` re-dispare el hook.
+- Flujo de release: commiteá con buen prefijo → la versión queda correcta → publicá el tag matching
+  (`git tag vX.Y.Z && git push origin vX.Y.Z`), que es lo que el workflow de CI clona.
