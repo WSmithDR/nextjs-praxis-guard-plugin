@@ -76,7 +76,9 @@ export default function (content, filePath, config = {}, full = {}) {
   });
   return out;
 }
-export const meta = { kind: 'project' }; // opcional: 'file' (default) o 'project'
+// `meta` es opcional. El ejemplo de arriba es una file rule (default, sin meta).
+// Para una project rule, declarala y usá la firma (projectTree, fullConfig):
+//   export const meta = { kind: 'project' };
 ```
 
 - **file rule** (default): `(content, filePath, ruleConfig, fullConfig) => Finding[]` — corre en el
