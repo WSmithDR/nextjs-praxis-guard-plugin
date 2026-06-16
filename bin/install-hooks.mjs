@@ -28,8 +28,13 @@ function writeHookFile(destDir, fileName, srcRel, cliName) {
 }
 
 function pluginGitUrl() {
-  try { return execSync('git remote get-url origin', { cwd: PLUGIN_ROOT, encoding: 'utf8' }).trim(); }
+  let url;
+  try { url = execSync('git remote get-url origin', { cwd: PLUGIN_ROOT, encoding: 'utf8' }).trim(); }
   catch { return '<PLUGIN_GIT_URL>'; }
+  // El CI no tiene SSH key: normalizamos a HTTPS para que un repo público clone solo.
+  url = url.replace(/^git@([^:]+):/, 'https://$1/');        // git@github.com:o/r.git
+  url = url.replace(/^ssh:\/\/git@([^/]+)\//, 'https://$1/'); // ssh://git@github.com/o/r.git
+  return url;
 }
 function pluginRef() {
   try {

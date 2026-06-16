@@ -13,7 +13,8 @@ jobs:
           node-version: '20'
       - run: npm ci
       - name: clone praxis-guard plugin
-        # repo privado: reemplazá la URL por https con ${{ secrets.PRAXIS_PLUGIN_TOKEN }} (ver README)
+        # El ref __PLUGIN_REF__ asume un tag publicado en el repo del plugin; si no existe, cambialo por 'main'.
+        # Repo privado: usá https con ${{ secrets.PRAXIS_PLUGIN_TOKEN }} en la URL (ver README).
         run: git clone --depth 1 --branch __PLUGIN_REF__ __PLUGIN_URL__ "$RUNNER_TEMP/praxis-plugin"
       - name: praxis-audit
         id: audit
