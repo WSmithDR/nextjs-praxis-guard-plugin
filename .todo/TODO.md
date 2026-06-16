@@ -11,12 +11,6 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Plan B: neutralizar secretos fake de los tests para esquivar GitHub push protection** —
-      los fixtures/tests usan `sk_live_…` con formato real (necesario: es un detector de secretos),
-      y GitHub los marca como "Stripe API Key" en cada push (hoy se resolvió permitiéndolos a mano).
-      Fix durable: acortar los fakes a <24 chars (siguen matcheando la regla, que pide 16+, pero
-      esquivan el detector de Stripe de GitHub que pide 24+). Requiere reescribir el historial o
-      aplicarlo de acá en más. _(creado por: SmithDR · 2026-06-15)_
 - [ ] **Aprovechar a fondo TS + Tailwind para "código bien logrado"** — profundizar los dos grupos
       más allá de Fase 1, hacia reglas que *empujen activamente* hacia código idiomático y de calidad:
       - **Tailwind:** premiar/sugerir el uso de los **objetos y clases custom del proyecto** (tokens
