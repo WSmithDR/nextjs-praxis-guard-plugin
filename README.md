@@ -129,6 +129,26 @@ node bin/praxis-audit.mjs --since <ref> --dir <p>   # incremental desde un ref
 node bin/praxis-audit.mjs --staged --dir <proyecto> # solo lo staged (pre-commit)
 ```
 
+### Baseline (adopción en repos con deuda)
+
+Correr el auditor en un repo grande existente puede tirar cientos de findings. Para adoptarlo sin
+ruido, aceptá la deuda actual una vez:
+
+```bash
+node bin/praxis-audit.mjs --update-baseline --dir <proyecto>
+```
+
+Eso guarda las huellas de los findings actuales en `.praxis-guard/baseline.json` (committealo: es
+deuda compartida). Desde ahí, `praxis-audit` por defecto **oculta** esos y muestra solo los
+findings **nuevos**, con un contador `N ocultos por baseline`. La huella es `sha256(regla + archivo
++ mensaje)` — **sin** número de línea, así que sobrevive a que el código se mueva.
+
+- `--no-baseline`: muestra todo, ignorando la baseline.
+- Cuando arreglás findings baselined, sus huellas quedan huérfanas; un audit `--full` te avisa
+  cuántas hay y `--update-baseline` re-snapshotea (limpia las resueltas).
+- El pre-commit (`--staged`) respeta la baseline: no te bloquea por deuda ya aceptada, solo por
+  findings nuevos.
+
 El estado se guarda en `.praxis-guard/meta.json` (`last_audited_commit`, `rules_fingerprint`,
 `plugin_version`, `reviewed_rules`). Si una versión del plugin agrega reglas nuevas, el hook
 `SessionStart` te avisa de las que quedaron **sin revisar** y te sugiere correr `praxis-config`.

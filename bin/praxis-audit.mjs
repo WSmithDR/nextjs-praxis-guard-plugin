@@ -16,6 +16,7 @@ import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { readMeta, writeMeta } from '../lib/meta.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
+import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -51,6 +52,18 @@ if (process.argv.includes('--fix-tsconfig')) {
   console.log(res.written
     ? `praxis-audit: tsconfig.json actualizado — agregados: ${res.missing.join(', ')}`
     : 'praxis-audit: nada que cambiar en tsconfig.json.');
+  process.exit(0);
+}
+
+if (process.argv.includes('--update-baseline')) {
+  const files = enumerateFiles(dir, config);
+  const all = [...runFileRules(files), ...runProjectRules()];
+  const fps = [...new Set(all.map(findingFingerprint))];
+  const old = readBaseline(dir);
+  const oldSet = new Set(old ? old.fingerprints : []);
+  const resolved = [...oldSet].filter((x) => !fps.includes(x)).length;
+  writeBaseline(dir, fps, { created_at: new Date().toISOString().slice(0, 10), plugin_version: pluginVersion() });
+  console.log(`praxis-audit: baseline actualizada — ${fps.length} aceptados (${resolved} resueltos salieron).`);
   process.exit(0);
 }
 
@@ -153,8 +166,19 @@ if (mode === 'full') {
   if (structuralChanged(dir, ref)) { findings = [...findings, ...runProjectRules()]; ranProject = true; }
 }
 
-report(findings);
-console.log(`praxis-audit: modo ${mode}${ranProject ? ' (con project rules)' : ''}.`);
+const baseline = process.argv.includes('--no-baseline') ? null : readBaseline(dir);
+const { shown, suppressed, resolvedCount } = applyBaseline(findings, baseline);
+
+report(shown);
+const modeStr = `modo ${mode}${ranProject ? ' (con project rules)' : ''}`;
+if (baseline) {
+  console.log(`praxis-audit: ${shown.length} nuevo(s), ${suppressed.length} ocultos por baseline. ${modeStr}.`);
+  if (mode === 'full' && resolvedCount > 0) {
+    console.log(`ℹ ${resolvedCount} findings de la baseline ya están resueltos — corré --update-baseline para limpiarlos.`);
+  }
+} else {
+  console.log(`praxis-audit: ${modeStr}.`);
+}
 
 // staged NO avanza el estado (el commit aún no ocurrió).
 if (mode !== 'staged') {
@@ -169,7 +193,7 @@ if (mode === 'staged') {
   if (commitCfg.block) {
     const rank = { info: 1, warn: 2, error: 3 };
     const min = rank[commitCfg.minSeverity] || 2;
-    if (findings.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
+    if (shown.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
   }
 }
 process.exit(exitCode);
