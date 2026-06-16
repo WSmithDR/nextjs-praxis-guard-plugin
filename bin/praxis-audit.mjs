@@ -193,7 +193,7 @@ if (mode === 'staged') {
   if (commitCfg.block) {
     const rank = { info: 1, warn: 2, error: 3 };
     const min = rank[commitCfg.minSeverity] || 2;
-    if (findings.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
+    if (shown.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
   }
 }
 process.exit(exitCode);
