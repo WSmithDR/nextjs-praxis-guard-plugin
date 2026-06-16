@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync, mkdirSync, chmodSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { execSync } from 'node:child_process';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -24,6 +25,17 @@ function writeHookFile(destDir, fileName, srcRel, cliName) {
   const dest = join(destDir, fileName);
   writeFileSync(dest, json);
   console.log(`installed ${cliName} hook -> ${dest}`);
+}
+
+function pluginGitUrl() {
+  try { return execSync('git remote get-url origin', { cwd: PLUGIN_ROOT, encoding: 'utf8' }).trim(); }
+  catch { return '<PLUGIN_GIT_URL>'; }
+}
+function pluginRef() {
+  try {
+    const m = JSON.parse(readFileSync(join(PLUGIN_ROOT, '.claude-plugin', 'plugin.json'), 'utf8'));
+    return m.version ? `v${m.version}` : 'main';
+  } catch { return 'main'; }
 }
 
 switch (cli) {
@@ -55,7 +67,18 @@ switch (cli) {
     console.log(`installed pre-commit hook -> ${dest}`);
     break;
   }
+  case 'github-action': {
+    const destDir = join(target, '.github', 'workflows');
+    mkdirSync(destDir, { recursive: true });
+    const body = readFileSync(join(PLUGIN_ROOT, 'cli/github-action.yml'), 'utf8')
+      .replace(/__PLUGIN_URL__/g, pluginGitUrl())
+      .replace(/__PLUGIN_REF__/g, pluginRef());
+    const dest = join(destDir, 'praxis-audit.yml');
+    writeFileSync(dest, body);
+    console.log(`installed github-action workflow -> ${dest}`);
+    break;
+  }
   default:
-    console.error('usage: node bin/install-hooks.mjs --target <dir> --cli <copilot|codex|opencode|precommit>');
+    console.error('usage: node bin/install-hooks.mjs --target <dir> --cli <copilot|codex|opencode|precommit|github-action>');
     process.exit(1);
 }
