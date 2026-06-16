@@ -5,6 +5,7 @@
   "type": "module",
   "private": true,
   "engines": { "node": ">=18" },
+  "devDependencies": { "typescript": "^5.4.0" },
   "scripts": {
     "test": "node test/run.mjs",
     "detect": "node hooks/detect.mjs"
