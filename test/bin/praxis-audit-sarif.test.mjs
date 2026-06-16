@@ -18,8 +18,8 @@ const sarif = JSON.parse(out);
 assert.equal(sarif.version, '2.1.0');
 assert.ok(sarif.runs[0].results.some((r) => r.ruleId === 'stringly-typed'), 'esperaba finding stringly-typed');
 
-// 2. --gate -> exit 1 (el fixture tiene un finding warn ≥ umbral default), y el SARIF
-//    igual sale por stdout antes del exit. (La matriz de umbral está en gate.test.mjs.)
+// 2. --gate -> exit 1 (el fixture produce findings ≥ umbral), y el SARIF igual sale por
+//    stdout antes del exit. (La matriz exacta de umbral está en gate.test.mjs.)
 let code = 0, gateOut = '';
 try { gateOut = execFileSync('node', [audit, '--full', '--format', 'sarif', '--gate', '--dir', proj], { encoding: 'utf8' }); }
 catch (e) { code = e.status; gateOut = e.stdout; }
