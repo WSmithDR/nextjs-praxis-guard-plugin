@@ -11,9 +11,6 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Salida SARIF + GitHub Action** — `praxis-audit --format sarif` + un workflow de CI que
-      corre el audit y comenta el PR (code scanning). Saca el plugin del loop del agente y lo
-      lleva al pipeline. Bajo esfuerzo (el motor ya devuelve findings estructurados). _(creado por: SmithDR · 2026-06-15)_
 - [ ] **Plan B: neutralizar secretos fake de los tests para esquivar GitHub push protection** —
       los fixtures/tests usan `sk_live_…` con formato real (necesario: es un detector de secretos),
       y GitHub los marca como "Stripe API Key" en cada push (hoy se resolvió permitiéndolos a mano).
