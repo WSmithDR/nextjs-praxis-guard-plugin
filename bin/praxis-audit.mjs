@@ -17,6 +17,7 @@ import { readMeta, writeMeta } from '../lib/meta.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
 import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
+import { loadCustomRules } from '../lib/custom-rules.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -31,6 +32,9 @@ function arg(name, def) {
 const dir = resolve(arg('dir', process.cwd()));
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
 try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
+
+const custom = await loadCustomRules(dir);
+for (const e of custom.errors) console.log(`⚠ regla custom "${e.id}" no cargó: ${e.error}`);
 
 if (process.argv.includes('--fix-tsconfig')) {
   const det = config.detected || {};
@@ -102,7 +106,7 @@ function runFileRules(relPaths) {
   for (const rel of relPaths) {
     const abs = join(dir, rel);
     let res;
-    try { res = runDetector(abs, { config }); } catch { continue; }
+    try { res = runDetector(abs, { config, customFileRules: custom.fileRules }); } catch { continue; }
     for (const f of res.findings) findings.push({ ...f, file: rel });
   }
   return findings;
@@ -111,7 +115,7 @@ function runFileRules(relPaths) {
 function runProjectRules() {
   const tree = buildProjectTree(enumerateFiles(dir, config));
   const findings = [];
-  for (const [id, fn] of Object.entries(PROJECT_RULES)) {
+  for (const [id, fn] of Object.entries({ ...custom.projectRules, ...PROJECT_RULES })) {
     const rc = (config.rules && config.rules[id]) || {};
     if (rc.enabled === false) continue;
     try { for (const f of fn(tree, config)) findings.push({ ...f, file: f.file || '(proyecto)' }); }
