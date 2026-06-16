@@ -2,7 +2,7 @@
 // AST rule: type a mano cuyas keys == las de un schema z.object -> sugerir z.infer.
 // Compara por NOMBRES de propiedad (los keys del z.object literal vs el named type),
 // que es determinístico y no depende de la versión de Zod.
-import { shapeNames, sameSet } from '../lib/ast-shapes.mjs';
+import { shapeNames, sameSet, isDerivedAlias } from '../lib/ast-shapes.mjs';
 
 export const meta = { kind: 'ast' };
 
@@ -32,11 +32,11 @@ export default function schemaTypeRedeclare(ctx, full = {}) {
   }
   if (!schemas.length) return [];
 
-  // 2. named types cuyo set de nombres == el de un schema.
+  // 2. named types (no ya derivados con z.infer) cuyo set de nombres == el de un schema.
   const out = [];
   for (const sf of sourceFiles) {
     ts.forEachChild(sf, function visit(node) {
-      if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name) {
+      if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name && !isDerivedAlias(ts, node)) {
         const names = shapeNames(ts, checker, checker.getTypeAtLocation(node.name));
         if (names.size >= minProps) {
           const match = schemas.find((s) => sameSet(s.keys, names));

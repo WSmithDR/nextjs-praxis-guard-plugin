@@ -16,10 +16,11 @@ export default function typeDuplicateShape(ctx, full = {}) {
   const out = [];
 
   // 1. duplicados exactos cross-file: una vez por par (i<j) gracias al orden estable.
+  //    Se saltean tipos ya derivados (Pick/Omit/z.infer): no son una duplicación.
   for (let i = 0; i < decls.length; i++) {
     for (let j = i + 1; j < decls.length; j++) {
       const a = decls[i], b = decls[j];
-      if (a.file === b.file) continue;
+      if (a.file === b.file || a.derived || b.derived) continue;
       if (sameShape(a.shape, b.shape)) {
         out.push({
           rule: 'type-duplicate-shape', severity: 'info', file: b.file, line: b.line,
@@ -31,14 +32,16 @@ export default function typeDuplicateShape(ctx, full = {}) {
 
   // 2. superset estricto: reportamos el mayor B (otro archivo) como base de un Pick/Omit.
   //    Empates de tamaño: gana el primero en orden estable (decls ya viene ordenado).
+  //    No marcamos tipos ya derivados, ni proponemos derivar DE un tipo derivado.
   for (const a of decls) {
+    if (a.derived) continue;
     let best = null;
     for (const b of decls) {
-      if (b === a || b.file === a.file) continue;
+      if (b === a || b.file === a.file || b.derived) continue;
       if (isSuperset(a.shape, b.shape) && (!best || b.shape.size > best.shape.size)) best = b;
     }
     if (best) {
-      const keys = [...best.shape.keys()].map((k) => `'${k}'`).join(', ');
+      const keys = [...best.shape.keys()].map((k) => `'${k}'`).join(' | ');
       out.push({
         rule: 'type-duplicate-shape', severity: 'info', file: a.file, line: a.line,
         message: `"${a.name}" repite las props de "${best.name}" (${best.file}). Considerá derivar: Pick<${best.name}, ${keys}> (o Omit).`,
