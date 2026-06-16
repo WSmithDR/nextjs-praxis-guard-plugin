@@ -73,4 +73,8 @@ assert.equal(validateConfig({ rules: { 'tsconfig-strictness': { baseline: 'stric
 assert.equal(validateConfig({ rules: { 'tailwind-classname-bloat': { maxClasses: '12' } } }).ok, false);
 assert.equal(validateConfig({ rules: { 'tailwind-arbitrary-values': { allow: 'x' } } }).ok, false);
 console.log('validate-config ts/tailwind cases ok');
+// --- extraKnownRules (reglas custom) ---
+assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }).ok, false);
+assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }, ['mi-regla']).ok, true);
+console.log('validate-config extraKnownRules ok');
 console.log('validate-config.test ok');

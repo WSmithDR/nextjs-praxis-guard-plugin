@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { validateConfig } from '../lib/validate-config.mjs';
+import { loadCustomRules, readCustomRuleSources } from '../lib/custom-rules.mjs';
 import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { writeMeta } from '../lib/meta.mjs';
@@ -68,7 +69,9 @@ if (cmd === 'write') {
   let obj;
   try { obj = JSON.parse(raw || '{}'); }
   catch { console.error('praxis-config: JSON inválido en stdin'); process.exit(1); }
-  const { ok, errors } = validateConfig(obj);
+  const custom = await loadCustomRules(dir);
+  const customIds = [...Object.keys(custom.fileRules), ...Object.keys(custom.projectRules)];
+  const { ok, errors } = validateConfig(obj, customIds);
   if (!ok) { console.error('praxis-config: config inválida:\n  - ' + errors.join('\n  - ')); process.exit(1); }
   mkdirSync(configDir, { recursive: true });
   writeAtomic(configPath, JSON.stringify(obj, null, 2) + '\n');
@@ -78,8 +81,8 @@ if (cmd === 'write') {
     configured_at: new Date().toISOString().slice(0, 10),
     plugin_version: pluginVersion(),
     schema_version: 1,
-    reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES)].sort(),
-    rules_fingerprint: rulesFingerprint(merged),
+    reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES), ...customIds].sort(),
+    rules_fingerprint: rulesFingerprint(merged, readCustomRuleSources(dir)),
   });
   console.log(`praxis-config: escrito ${configPath}`);
   process.exit(0);
