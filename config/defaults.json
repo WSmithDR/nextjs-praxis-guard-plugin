@@ -27,6 +27,10 @@
     "tailwind-arbitrary-values": { "enabled": true, "allow": [] },
     "tailwind-classname-bloat": { "enabled": true, "maxClasses": 12 },
     "tailwind-conditional-concat": { "enabled": true },
-    "tailwind-duplicate-utilities": { "enabled": true }
+    "tailwind-duplicate-utilities": { "enabled": true },
+    "type-duplicate-shape": { "enabled": true, "minProps": 2 },
+    "inline-shape-extract": { "enabled": true, "minProps": 2 },
+    "schema-type-redeclare": { "enabled": true, "minProps": 2 },
+    "magic-literal-repeated": { "enabled": true, "minFiles": 3, "minLen": 4 }
   }
 }
