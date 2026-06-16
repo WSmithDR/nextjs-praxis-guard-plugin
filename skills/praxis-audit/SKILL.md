@@ -22,6 +22,10 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
   - Snapshotea TODOS los findings actuales en `.praxis-guard/baseline.json` (committealo). Desde
     ahí, las corridas normales ocultan esos y muestran solo lo **nuevo**.
 - Ver todo (ignorar baseline): agregá `--no-baseline`.
+- CI / SARIF: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --full --deep --format sarif --gate --dir <proyecto>`
+  - `--format sarif`: a stdout va **solo** el JSON SARIF 2.1.0 (diagnósticos a stderr) → `> praxis.sarif`.
+  - `--gate`: exit 1 si hay findings (mostrados, post-baseline) ≥ `commit.minSeverity`. Es plomería de
+    CI (lo usa el workflow `github-action`), no UX humana cotidiana.
 - **Profunda** (análisis de tipos cruzando archivos): agregá `--deep` (alias `--ast`).
   - Corre además las reglas AST de reuso de tipos (`type-duplicate-shape`,
     `inline-shape-extract`, `schema-type-redeclare`). Arma el programa TS del proyecto

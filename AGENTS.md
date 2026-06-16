@@ -45,6 +45,12 @@ El modo **profundo** (`praxis-audit --deep`) corre además las reglas AST de reu
 es plomería interna (no se tipea a mano). También se puede activar por config con
 `rules.<id>.runOn: "full"` (para que un equipo las corra en la auditoría completa / CI).
 
+Para CI: `praxis-audit --format sarif` emite los findings en SARIF 2.1.0 (estándar neutral que
+lee GitHub code scanning) y `--gate` hace exit 1 si hay findings nuevos ≥ `commit.minSeverity`.
+Instalá el workflow con `node bin/install-hooks.mjs --cli github-action --target <proyecto>`:
+audita el PR en profundidad, sube las anotaciones y frena el merge según el umbral. El workflow
+clona el plugin a un tag fijado; repo privado → token (ver README).
+
 El estado vive en `.praxis-guard/meta.json` (`last_audited_commit`, `rules_fingerprint`,
 `plugin_version`, `reviewed_rules`). Si aparecen reglas sin revisar, el hook `SessionStart`
 te ofrece correr `praxis-config`. El pre-commit por default **avisa sin bloquear**; activá

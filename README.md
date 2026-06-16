@@ -128,9 +128,31 @@ Dónde cae cada archivo en `<proyecto>`:
 | `copilot` | `.github/hooks/praxis-guard.json` |
 | `opencode` | `.opencode/plugins/praxis-guard.mjs` |
 | `precommit` | `.git/hooks/pre-commit` (corre `praxis-audit --staged`) |
+| `github-action` | `.github/workflows/praxis-audit.yml` (audita el PR, sube SARIF) |
 
 > **Caveat OpenCode:** por ahora los avisos se emiten al *log stream* de OpenCode
 > (`client.app.log`). La re-inyección al contexto del agente **está sin verificar**.
+
+### CI: GitHub Action (code scanning)
+
+`node bin/install-hooks.mjs --cli github-action --target <proyecto>` escribe
+`.github/workflows/praxis-audit.yml`. En cada Pull Request corre la auditoría **profunda**
+(`--full --deep`), sube los findings como anotaciones inline (code scanning de GitHub) y **frena
+el merge** si hay findings nuevos ≥ `commit.minSeverity` (default `warn`). Lleva el chequeo al
+pipeline: pasa siempre, sin depender de quién tenga el plugin instalado.
+
+El workflow clona el plugin a un **ref fijado** (`v<version>`, inyectado al instalar). Requisitos:
+
+- El repo del plugin debe tener publicado ese **tag** (`vX.Y.Z`); si todavía no, cambiá el `--branch`
+  del paso *clone* por `main`.
+- El proyecto consumidor necesita un **lockfile** (`npm ci` instala las deps para que `typescript`
+  resuelva en `--deep`).
+- Repo del plugin **privado:** cambiá la URL del paso *clone* por
+  `https://x-access-token:${{ secrets.PRAXIS_PLUGIN_TOKEN }}@github.com/<owner>/<repo>.git` y definí
+  ese secret en el proyecto.
+
+Para otros CI: `praxis-audit --format sarif` emite SARIF 2.1.0 a stdout (estándar neutral) y
+`--gate` hace exit 1 según `commit.minSeverity`.
 
 ## Uso standalone
 
