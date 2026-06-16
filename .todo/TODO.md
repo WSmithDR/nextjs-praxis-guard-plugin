@@ -11,17 +11,13 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Aprovechar a fondo TS + Tailwind para "código bien logrado"** — profundizar los dos grupos
-      más allá de Fase 1, hacia reglas que *empujen activamente* hacia código idiomático y de calidad:
-      - **Tailwind:** premiar/sugerir el uso de los **objetos y clases custom del proyecto** (tokens
-        del `tailwind.config` theme, utilities propias, `@apply`, componentes con `cva`/`tailwind-variants`)
-        en vez de valores sueltos — leyendo el theme para validar contra la paleta/spacing reales
-        (extiende `tailwind-arbitrary-values`, que hoy solo detecta el patrón sin parsear el theme).
-      - **TypeScript:** guiar el aprovechamiento de todas las bondades del sistema de tipos
-        (utility types, generics, discriminated unions, `satisfies`, branded types, `as const`,
-        inferencia desde schemas Zod/Valibot, etc.) para código mejor tipado y reutilizable.
-      Engancha con la Fase 2 AST (lo más profundo necesita el type-checker) y con leer `tailwind.config`.
-      _(creado por: SmithDR · 2026-06-15)_
+- [ ] **Tailwind theme-aware (sub-proyecto B)** — premiar/sugerir el uso de los **objetos y clases
+      custom del proyecto** (tokens del `tailwind.config` theme, utilities propias, `@apply`, componentes
+      con `cva`/`tailwind-variants`) en vez de valores sueltos — leyendo el theme para validar contra la
+      paleta/spacing reales (extiende `tailwind-arbitrary-values`, que hoy solo detecta el patrón sin
+      parsear el theme). Lo difícil: parsear `tailwind.config.*` (JS/TS, `require`, plugins, `extends`) sin
+      ejecutar código arbitrario, y contemplar v4 (config en CSS `@theme`) vs v3 (config JS). El
+      sub-proyecto A (TypeScript a fondo) ya se hizo. _(creado por: SmithDR · 2026-06-15)_
 
 ## Q4 — Backlog / futuro (NO en v1)
 
