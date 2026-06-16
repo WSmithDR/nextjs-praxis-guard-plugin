@@ -19,6 +19,13 @@
       ejecutar código arbitrario, y contemplar v4 (config en CSS `@theme`) vs v3 (config JS). El
       sub-proyecto A (TypeScript a fondo) ya se hizo. _(creado por: SmithDR · 2026-06-15)_
 
+- [ ] **Premiar abstracción de componentes Tailwind (@apply/cva)** — refinar el mensaje de
+      `tailwind-classname-bloat` (que ya detecta `className` con demasiadas clases): si el proyecto usa
+      `cva`/`tailwind-variants` (detectable por el import) o tiene CSS con `@apply`, sugerir extraer la
+      lista larga a un componente/utility en vez del aviso genérico. NO es theme-aware (estructural) y
+      solapa con `tailwind-classname-bloat` — por eso se sacó del sub-proyecto B; va como refinamiento de
+      esa regla, no como regla nueva. _(creado por: SmithDR · 2026-06-16)_
+
 ## Q4 — Backlog / futuro (NO en v1)
 
 - [ ] Skills de conocimiento/convenciones Next.js.
