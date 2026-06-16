@@ -41,6 +41,9 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
      (`minProps`), `schema-type-redeclare` (`minProps`), y `magic-literal-repeated` (`minFiles`,
      `minLen`; project rule sin AST). Param opcional común `runOn: "full"` para correrlas también
      en la auditoría completa / CI sin pasar `--deep`.
+   - **Reglas TypeScript idiomático (AST, `--deep`):** `prefer-satisfies` (`minProps`) y
+     `as-const-opportunity` (prendidas); `prefer-discriminated-union` (`minMembers`) y
+     `prefer-branded-type` (`pattern`) — **experimentales, `enabled:false` por default**, prendelas a demanda.
    - **Reglas Tailwind** (autodetect si hay `tailwind.config.*`): `tailwind-arbitrary-values`
      (`allow`), `tailwind-classname-bloat` (`maxClasses`), `tailwind-conditional-concat`,
      `tailwind-duplicate-utilities`.

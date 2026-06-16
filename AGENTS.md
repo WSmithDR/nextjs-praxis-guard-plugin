@@ -12,7 +12,9 @@ duplican ESLint): `repeated-object-shape`, `stringly-typed`, `duplicate-literal-
 `praxis-audit --fix-tsconfig`). Reglas TypeScript con AST (Fase 2, **modo profundo** `--deep`;
 usan el `typescript` del proyecto, reuso real de tipos cruzando archivos): `type-duplicate-shape`
 (sugiere `Pick`/`Omit`), `inline-shape-extract` y `schema-type-redeclare` (sugiere `z.infer`).
-Más `magic-literal-repeated` (project rule, literal repetido en N archivos). Reglas Tailwind (autodetect si hay `tailwind.config.*`):
+Más reglas AST de "código idiomático" (también `--deep`): `prefer-satisfies`, `as-const-opportunity`
+(prendidas), y `prefer-discriminated-union` + `prefer-branded-type` (experimentales, `enabled:false`
+por default). Más `magic-literal-repeated` (project rule, literal repetido en N archivos). Reglas Tailwind (autodetect si hay `tailwind.config.*`):
 `tailwind-arbitrary-values`, `tailwind-classname-bloat`, `tailwind-conditional-concat`,
 `tailwind-duplicate-utilities`. Config por proyecto en `nextjs-praxis-guard.json` (raíz,
 CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
