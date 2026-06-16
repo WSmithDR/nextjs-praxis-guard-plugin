@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { validateConfig } from '../lib/validate-config.mjs';
-import { loadCustomRules } from '../lib/custom-rules.mjs';
+import { loadCustomRules, readCustomRuleSources } from '../lib/custom-rules.mjs';
 import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { writeMeta } from '../lib/meta.mjs';
@@ -82,7 +82,7 @@ if (cmd === 'write') {
     plugin_version: pluginVersion(),
     schema_version: 1,
     reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES)].sort(),
-    rules_fingerprint: rulesFingerprint(merged),
+    rules_fingerprint: rulesFingerprint(merged, readCustomRuleSources(dir)),
   });
   console.log(`praxis-config: escrito ${configPath}`);
   process.exit(0);

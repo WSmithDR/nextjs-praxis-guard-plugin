@@ -17,7 +17,7 @@ import { readMeta, writeMeta } from '../lib/meta.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
 import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
-import { loadCustomRules } from '../lib/custom-rules.mjs';
+import { loadCustomRules, readCustomRuleSources } from '../lib/custom-rules.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -136,7 +136,7 @@ function report(findings) {
 }
 
 const meta = readMeta(dir);
-const fp = rulesFingerprint(config);
+const fp = rulesFingerprint(config, readCustomRuleSources(dir));
 const ver = pluginVersion();
 const forceFull = process.argv.includes('--full');
 const staged = process.argv.includes('--staged');
