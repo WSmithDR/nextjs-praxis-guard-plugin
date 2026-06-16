@@ -11,13 +11,17 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Tailwind theme-aware (sub-proyecto B)** — premiar/sugerir el uso de los **objetos y clases
-      custom del proyecto** (tokens del `tailwind.config` theme, utilities propias, `@apply`, componentes
-      con `cva`/`tailwind-variants`) en vez de valores sueltos — leyendo el theme para validar contra la
-      paleta/spacing reales (extiende `tailwind-arbitrary-values`, que hoy solo detecta el patrón sin
-      parsear el theme). Lo difícil: parsear `tailwind.config.*` (JS/TS, `require`, plugins, `extends`) sin
-      ejecutar código arbitrario, y contemplar v4 (config en CSS `@theme`) vs v3 (config JS). El
-      sub-proyecto A (TypeScript a fondo) ya se hizo. _(creado por: SmithDR · 2026-06-15)_
+- [ ] **Bug: autobump no sincroniza los manifiestos por-CLI** — el hook `post-commit`
+      (`bin/dev/git-hooks/post-commit`) solo bumpea `.claude-plugin/plugin.json`; los otros manifiestos con
+      versión (`.codex-plugin/plugin.json`, `.copilot-plugin/plugin.json`, `gemini-extension.json`,
+      `opencode.json`) quedaron en 0.1.0 y driftearon. Fix: que el hook sincronice TODOS los manifiestos
+      (o portar `bin/bump-version.py` del catálogo) + un re-sync de una pasada para alinearlos al actual.
+      _(creado por: SmithDR · 2026-06-16)_
+
+- [ ] **Tailwind v4 CSS-only (@theme) — detección + parseo** — el sub-proyecto B cubre config-file (v3 y
+      v4 con archivo); un proyecto v4 CSS-puro (`@theme` en CSS, sin `tailwind.config.*`) hoy ni se detecta
+      (`detect-stack` solo mira archivos de config). Extender la detección a escanear CSS (`@import "tailwindcss"`
+      / `@theme`) y que `tailwind-theme.mjs` lea los `--color-*`/`--spacing-*` del CSS. _(creado por: SmithDR · 2026-06-16)_
 
 - [ ] **Premiar abstracción de componentes Tailwind (@apply/cva)** — refinar el mensaje de
       `tailwind-classname-bloat` (que ya detecta `className` con demasiadas clases): si el proyecto usa
