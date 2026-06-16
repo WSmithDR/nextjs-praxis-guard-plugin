@@ -41,6 +41,9 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
      `tailwind-duplicate-utilities`.
    - **`commit`**: `{ check, block, minSeverity }` — controla el pre-commit (avisa por
      default; `block: true` aborta el commit si hay findings ≥ `minSeverity`).
+   - **Reglas custom** (`.praxis-guard/rules/<id>.mjs`): si el proyecto tiene reglas propias, sus
+     ids también se pueden activar/parametrizar en `config.rules[<id>]`. El CLI las reconoce
+     (no las marca como desconocidas).
    En modo editar, preguntá SOLO qué quiere cambiar; respetá lo demás.
 
 3. **Construí el objeto config** declarando únicamente lo que difiere de los defaults

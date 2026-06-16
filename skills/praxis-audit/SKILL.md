@@ -42,3 +42,5 @@ El motor estampa en `.praxis-guard/meta.json`: `last_audited_commit`, `rules_fin
 - El motor nunca rompe la edición ni la sesión: exit 0 salvo el caso `--staged` con
   `commit.block: true` y findings ≥ `commit.minSeverity` (aborta el commit).
 - Las reglas de arquitectura solo corren si el proyecto declaró `architecture.strategy`.
+- Las reglas custom de `.praxis-guard/rules/*.mjs` corren en la auditoría (file + project). Si una
+  no carga (syntax error / colisión con built-in), se reporta `⚠ regla custom "x" no cargó` sin abortar.

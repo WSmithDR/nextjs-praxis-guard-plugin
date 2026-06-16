@@ -61,6 +61,33 @@ Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `classN
 es JSON limpio sin `extends`; si tiene comentarios o `extends`, no toca el archivo y te lista
 los flags para agregar a mano. El flujo normal de `praxis-audit` nunca modifica `tsconfig.json`.
 
+## Reglas custom por proyecto
+
+Cada proyecto puede definir reglas propias en `.praxis-guard/rules/<id>.mjs` (committeables). El
+nombre del archivo es el `id`. Mismo contrato que las built-in:
+
+```js
+// .praxis-guard/rules/no-console.mjs
+export default function (content, filePath, config = {}, full = {}) {
+  const out = [];
+  content.split('\n').forEach((line, i) => {
+    if (/\bconsole\.(log|debug)\(/.test(line))
+      out.push({ rule: 'no-console', line: i + 1, severity: 'warn', message: 'console.* en producción.' });
+  });
+  return out;
+}
+export const meta = { kind: 'project' }; // opcional: 'file' (default) o 'project'
+```
+
+- **file rule** (default): `(content, filePath, ruleConfig, fullConfig) => Finding[]` — corre en el
+  hook (en vivo) y en la auditoría.
+- **project rule** (`meta.kind: 'project'`): `(projectTree, fullConfig) => Finding[]` — corre solo
+  en la auditoría.
+- Está activa por existir el archivo; se apaga/parametriza con `config.rules[<id>]`.
+- Un id que choca con una regla built-in se ignora (gana el built-in). Un archivo roto se saltea
+  con un aviso en la auditoría; nunca rompe el hook.
+- Editar una regla custom dispara una auditoría completa (entra en el fingerprint).
+
 ## Cómo funciona
 
 1. Cada CLI dispara un hook **post-edición** después de que el agente escribe/edita un archivo.

@@ -14,6 +14,10 @@ duplican ESLint): `repeated-object-shape`, `stringly-typed`, `duplicate-literal-
 `tailwind-duplicate-utilities`. Config por proyecto en `nextjs-praxis-guard.json` (raíz,
 CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
 
+Reglas custom por proyecto: archivos `.praxis-guard/rules/<id>.mjs` (default export = la función
+regla, `export const meta = { kind: 'file'|'project' }` opcional). Corren en el hook (file) y en la
+auditoría (file+project), con el mismo contrato que las built-in. Se configuran por `config.rules[<id>]`.
+
 Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de continuar.
 
 ## Soporte por CLI
