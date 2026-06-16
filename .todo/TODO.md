@@ -11,11 +11,6 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Fase 2 TS con AST (`Pick`/`Omit`/derivación de tipos)** — las reglas de *reuso real*
-      de tipos cruzando archivos (sugerir `Pick<Otro, ...>`/`Omit`, derivar en vez de duplicar)
-      necesitan el type-checker de TS (no se hace honesto con regex). Implica dependencia
-      `typescript` + una nueva clase de **"ast rule"** que corra solo en la auditoría (lenta).
-      Es la continuación natural del grupo `typescript` (Fase 1 ya mergeada). _(creado por: SmithDR · 2026-06-15)_
 - [ ] **Salida SARIF + GitHub Action** — `praxis-audit --format sarif` + un workflow de CI que
       corre el audit y comenta el PR (code scanning). Saca el plugin del loop del agente y lo
       lleva al pipeline. Bajo esfuerzo (el motor ya devuelve findings estructurados). _(creado por: SmithDR · 2026-06-15)_

@@ -11,10 +11,11 @@ import { isInScope } from '../lib/scope.mjs';
 import { formatFindings } from '../lib/findings.mjs';
 import { enumerateFiles, buildProjectTree } from '../lib/walk.mjs';
 import { runDetector } from '../hooks/detect.mjs';
-import { PROJECT_RULES } from '../rules/index.mjs';
+import { PROJECT_RULES, AST_RULES } from '../rules/index.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { readMeta, writeMeta } from '../lib/meta.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
+import { buildTsContext } from '../lib/ts-program.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
 import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
 import { loadCustomRules, readCustomRuleSources } from '../lib/custom-rules.mjs';
@@ -114,11 +115,35 @@ function runFileRules(relPaths) {
 
 function runProjectRules() {
   const tree = buildProjectTree(enumerateFiles(dir, config));
+  tree.root = dir;
   const findings = [];
   for (const [id, fn] of Object.entries({ ...custom.projectRules, ...PROJECT_RULES })) {
     const rc = (config.rules && config.rules[id]) || {};
     if (rc.enabled === false) continue;
     try { for (const f of fn(tree, config)) findings.push({ ...f, file: f.file || '(proyecto)' }); }
+    catch { /* una regla rota nunca rompe la auditoría */ }
+  }
+  return findings;
+}
+
+function anyAstRunsOnFull() {
+  return Object.keys({ ...custom.astRules, ...AST_RULES }).some((id) => {
+    const rc = (config.rules && config.rules[id]) || {};
+    return rc.enabled !== false && rc.runOn === 'full';
+  });
+}
+
+async function runAstRules() {
+  const astCtx = await buildTsContext(dir, config);
+  if (!astCtx) {
+    console.log('praxis-audit: reglas AST omitidas — typescript no está instalado en el proyecto.');
+    return [];
+  }
+  const findings = [];
+  for (const [id, fn] of Object.entries({ ...custom.astRules, ...AST_RULES })) {
+    const rc = (config.rules && config.rules[id]) || {};
+    if (rc.enabled === false) continue;
+    try { for (const f of fn(astCtx, config)) findings.push({ ...f, file: f.file || '(proyecto)' }); }
     catch { /* una regla rota nunca rompe la auditoría */ }
   }
   return findings;
@@ -168,6 +193,11 @@ if (mode === 'full') {
   findings = runFileRules(targets);
   const ref = sinceArg || meta.last_audited_commit;
   if (structuralChanged(dir, ref)) { findings = [...findings, ...runProjectRules()]; ranProject = true; }
+}
+
+const deep = process.argv.includes('--deep') || process.argv.includes('--ast');
+if (deep || (mode === 'full' && anyAstRunsOnFull())) {
+  findings = [...findings, ...await runAstRules()];
 }
 
 const baseline = process.argv.includes('--no-baseline') ? null : readBaseline(dir);

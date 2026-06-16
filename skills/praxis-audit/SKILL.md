@@ -22,10 +22,27 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
   - Snapshotea TODOS los findings actuales en `.praxis-guard/baseline.json` (committealo). Desde
     ahí, las corridas normales ocultan esos y muestran solo lo **nuevo**.
 - Ver todo (ignorar baseline): agregá `--no-baseline`.
+- **Profunda** (análisis de tipos cruzando archivos): agregá `--deep` (alias `--ast`).
+  - Corre además las reglas AST de reuso de tipos (`type-duplicate-shape`,
+    `inline-shape-extract`, `schema-type-redeclare`). Arma el programa TS del proyecto
+    una sola vez → es **lento** (segundos en repos grandes). Requiere `typescript`
+    instalado en el proyecto; si falta, se omiten con un aviso.
+
+## Profundidad (preguntale al usuario)
+
+Antes de auditar, ofrecé elegir qué tan profundo:
+
+1. **Rápida** — reglas de contenido / arquitectura / TS heurísticas (segundos).
+   `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --dir <proyecto>`
+2. **Profunda** — además análisis de tipos cruzando archivos (Pick/Omit, derivación). Más lenta.
+   `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --deep --dir <proyecto>`
+
+`--deep` es plomería interna: el usuario elige del menú, vos traducís a la bandera. Si el
+proyecto tiene `tsconfig.json` y nunca se corrió la profunda, destacá la opción 2.
 
 ## Proceso
 
-1. Correr el comando auto sobre la raíz del proyecto.
+1. Correr el comando (auto, o `--deep` si el usuario eligió profunda) sobre la raíz del proyecto.
 2. Leer el reporte (findings agrupados por archivo + el modo usado).
 3. Presentarle al usuario los findings priorizados; si hay muchos, agrupar por regla.
 4. Si aparece un finding de arquitectura y el proyecto aún no declaró estrategia

@@ -31,6 +31,6 @@ try {
 
   // sin dir rules -> vacío
   const empty = await loadCustomRules(mkdtempSync(join(tmpdir(), 'praxis-nocustom-')));
-  assert.deepEqual(empty, { fileRules: {}, projectRules: {}, errors: [] });
+  assert.deepEqual(empty, { fileRules: {}, projectRules: {}, astRules: {}, errors: [] });
   console.log('custom-rules.test ok');
 } finally { rmSync(dir, { recursive: true, force: true }); }

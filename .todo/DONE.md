@@ -1,6 +1,6 @@
 # Completados — nextjs-praxis-guard-plugin
 
-_Última actualización: 2026-06-15_
+_Última actualización: 2026-06-16_
 
 ## MVP (Q1–Q3 originales)
 
@@ -27,3 +27,4 @@ _Última actualización: 2026-06-15_
 - [x] **Reglas TypeScript + Tailwind (Fase 1)** — TS (repeated-object-shape, stringly-typed, duplicate-literal-union, prefer-as-const, tsconfig-strictness + fixer `--fix-tsconfig`) y Tailwind (arbitrary-values, classname-bloat, conditional-concat, duplicate-utilities), con autodetección de stack. ✓ _resuelto: Merge feat/typescript-tailwind-rules — responsable: SmithDR · 2026-06-15_
 - [x] **Baseline / suppress** — aceptar la deuda actual (`--update-baseline`) y mostrar solo findings nuevos; `--no-baseline`, aviso de huérfanas, pre-commit respeta baseline. ✓ _resuelto: Merge feat/audit-baseline — responsable: SmithDR · 2026-06-15_
 - [x] **Reglas custom por proyecto** — `.praxis-guard/rules/<id>.mjs` cargadas dinámicamente, corren en hook (file) + auditoría (file+project), con drift/fingerprint/validación integrados. ✓ _resuelto: Merge feat/custom-rules — responsable: SmithDR · 2026-06-15_
+- [x] **Fase 2 TS con AST (`Pick`/`Omit`/derivación de tipos)** — reglas de reuso real de tipos cruzando archivos, necesitan el type-checker de TS. _(creado por: SmithDR · 2026-06-15)_ ✓ _resuelto: nueva clase de regla `ast` (`buildTsContext` arma el programa TS del proyecto una vez, `typescript` peer/optional) con `type-duplicate-shape` (Pick/Omit + duplicado exacto), `inline-shape-extract`, `schema-type-redeclare` (z.infer), más `magic-literal-repeated` (project rule). Modo profundo opt-in `praxis-audit --deep` / `runOn:'full'` (nunca en hook ni pre-commit), menú rápida/profunda en la skill. Fingerprint/validate-config/praxis-config integrados; guard anti-falso-positivo en código ya derivado. 63/63 tests. Rama feat/typescript-ast-rules — responsable: SmithDR · 2026-06-16_

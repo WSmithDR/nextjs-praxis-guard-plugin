@@ -18,6 +18,10 @@ import tailwindArbitraryValues from './tailwind-arbitrary-values.mjs';
 import tailwindClassnameBloat from './tailwind-classname-bloat.mjs';
 import tailwindConditionalConcat from './tailwind-conditional-concat.mjs';
 import tailwindDuplicateUtilities from './tailwind-duplicate-utilities.mjs';
+import typeDuplicateShape from './type-duplicate-shape.mjs';
+import inlineShapeExtract from './inline-shape-extract.mjs';
+import schemaTypeRedeclare from './schema-type-redeclare.mjs';
+import magicLiteralRepeated from './magic-literal-repeated.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -46,4 +50,13 @@ export const RULES = {
 export const PROJECT_RULES = {
   'architecture-coherence': architectureCoherence,
   'tsconfig-strictness': tsconfigStrictness,
+  'magic-literal-repeated': magicLiteralRepeated,
+};
+
+// AST rules: (astContext, fullConfig) => Finding[]
+// Corren SOLO en la auditoría profunda (--deep / runOn:'full'). Usan el type-checker.
+export const AST_RULES = {
+  'type-duplicate-shape': typeDuplicateShape,
+  'inline-shape-extract': inlineShapeExtract,
+  'schema-type-redeclare': schemaTypeRedeclare,
 };
