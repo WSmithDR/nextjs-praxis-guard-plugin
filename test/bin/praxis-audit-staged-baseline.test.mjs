@@ -15,20 +15,20 @@ try {
   mkdirSync(join(dir, '.praxis-guard'), { recursive: true });
   mkdirSync(join(dir, 'src'), { recursive: true });
   writeFileSync(join(dir, '.praxis-guard', 'config.json'), JSON.stringify({ rules: { secrets: { enabled: true } }, commit: { check: true, block: true, minSeverity: 'warn' } }));
-  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef";');
+  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef";');
   git(dir, ['add', '-A']); git(dir, ['commit', '-qm', 'init']);
 
   // aceptar la deuda actual (incluye old.ts)
   assert.equal(spawnSync('node', [AUDIT, '--update-baseline', '--dir', dir], { encoding: 'utf8' }).status, 0);
 
   // staged solo old.ts (baselined) -> NO bloquea
-  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef"; // edit');
+  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef"; // edit');
   git(dir, ['add', 'src/old.ts']);
   let r = spawnSync('node', [AUDIT, '--staged', '--dir', dir], { encoding: 'utf8' });
   assert.equal(r.status, 0, 'baselined staged no bloquea');
 
   // staged un finding NUEVO -> bloquea
-  writeFileSync(join(dir, 'src', 'new.ts'), 'const z = "sk_live_ffffffffffffffffffffffffffffffff";');
+  writeFileSync(join(dir, 'src', 'new.ts'), 'const z = "sk_live_ffffffffffffffff";');
   git(dir, ['add', 'src/new.ts']);
   r = spawnSync('node', [AUDIT, '--staged', '--dir', dir], { encoding: 'utf8' });
   assert.equal(r.status, 1, 'finding nuevo staged bloquea');

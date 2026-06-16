@@ -16,7 +16,7 @@ function setup(commitCfg) {
   mkdirSync(join(dir, '.praxis-guard'), { recursive: true });
   mkdirSync(join(dir, 'src'), { recursive: true });
   writeFileSync(join(dir, '.praxis-guard', 'config.json'), JSON.stringify({ rules: { secrets: { enabled: true } }, commit: commitCfg }));
-  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef";');
+  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef";');
   git(dir, ['add', 'src/leak.ts']);   // staged
   return dir;
 }

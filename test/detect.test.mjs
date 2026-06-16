@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 assert.deepEqual(runDetector('README.md', { content: 'sk_live_aaaaaaaaaaaaaaaaaa' }).findings, []);
 
 // in-scope file with a secret => finding
-const r = runDetector('lib/keys.ts', { content: 'const k = "sk_live_51H8aQwEXAMPLEabcdef0123456789";' });
+const r = runDetector('lib/keys.ts', { content: 'const k = "sk_live_EXAMPLEkey123456";' });
 assert.ok(r.findings.length >= 1, 'detects secret');
 assert.ok(r.text.includes('praxis-guard'), 'formatted text present');
 

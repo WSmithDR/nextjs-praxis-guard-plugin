@@ -14,13 +14,13 @@ try {
   mkdirSync(join(dir, '.praxis-guard'), { recursive: true });
   mkdirSync(join(dir, 'src'), { recursive: true });
   writeFileSync(join(dir, '.praxis-guard', 'config.json'), JSON.stringify({ rules: { secrets: { enabled: true } } }));
-  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef";');
+  writeFileSync(join(dir, 'src', 'old.ts'), 'const k = "sk_live_0123456789abcdef";');
 
   // aceptar la deuda actual
   assert.equal(run(dir, '--update-baseline').status, 0);
 
   // agregar un finding NUEVO
-  writeFileSync(join(dir, 'src', 'new.ts'), 'const z = "sk_live_ffffffffffffffffffffffffffffffff";');
+  writeFileSync(join(dir, 'src', 'new.ts'), 'const z = "sk_live_ffffffffffffffff";');
 
   // default: oculta el viejo, muestra solo el nuevo
   const r = run(dir, '--full');

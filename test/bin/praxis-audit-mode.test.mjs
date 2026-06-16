@@ -29,7 +29,7 @@ try {
   assert.ok(meta1.rules_fingerprint, 'estampa fingerprint');
 
   // agregar un archivo con secreto y commitear
-  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef";');
+  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef";');
   git(dir, ['add', '-A']); git(dir, ['commit', '-qm', 'leak']);
 
   // 2ª corrida: misma versión+fingerprint -> incremental -> audita solo el diff (leak.ts)

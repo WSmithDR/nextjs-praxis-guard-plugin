@@ -15,7 +15,7 @@ try {
   writeFileSync(join(dir, '.praxis-guard', 'config.json'), JSON.stringify({
     rules: { secrets: { enabled: true } }
   }));
-  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef0123456789abcdef";');
+  writeFileSync(join(dir, 'src', 'leak.ts'), 'const k = "sk_live_0123456789abcdef";');
 
   const r = spawnSync('node', [AUDIT, '--full', '--dir', dir], { encoding: 'utf8' });
   assert.equal(r.status, 0, `exit 0, got ${r.status}: ${r.stderr}`);
