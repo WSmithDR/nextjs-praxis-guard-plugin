@@ -34,7 +34,7 @@ function arg(name, def) {
 
 const dir = resolve(arg('dir', process.cwd()));
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
-try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
+try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tailwindConfigPath: null, tsconfigOptions: null, tsconfigFixable: false }; }
 
 const format = arg('format', 'human');
 const note = (m) => (format === 'sarif' ? console.error(m) : console.log(m));
