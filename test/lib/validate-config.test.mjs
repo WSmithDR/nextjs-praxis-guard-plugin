@@ -73,6 +73,19 @@ assert.equal(validateConfig({ rules: { 'tsconfig-strictness': { baseline: 'stric
 assert.equal(validateConfig({ rules: { 'tailwind-classname-bloat': { maxClasses: '12' } } }).ok, false);
 assert.equal(validateConfig({ rules: { 'tailwind-arbitrary-values': { allow: 'x' } } }).ok, false);
 console.log('validate-config ts/tailwind cases ok');
+// --- reglas AST (Fase 2) + runOn ---
+{
+  const ok = validateConfig({ rules: {
+    'type-duplicate-shape': { enabled: true, minProps: 2, runOn: 'full' },
+    'inline-shape-extract': { enabled: true, minProps: 2 },
+    'schema-type-redeclare': { enabled: true, minProps: 2, runOn: 'deep' },
+    'magic-literal-repeated': { enabled: true, minFiles: 3, minLen: 4 },
+  }});
+  assert.equal(ok.ok, true, JSON.stringify(ok.errors));
+}
+assert.equal(validateConfig({ rules: { 'type-duplicate-shape': { runOn: 'fulll' } } }).ok, false);
+assert.equal(validateConfig({ rules: { 'magic-literal-repeated': { minFiles: '3' } } }).ok, false);
+console.log('validate-config ast cases ok');
 // --- extraKnownRules (reglas custom) ---
 assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }).ok, false);
 assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }, ['mi-regla']).ok, true);
