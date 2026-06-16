@@ -18,6 +18,10 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
 - Arreglar tsconfig (opt-in): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --fix-tsconfig --dir <proyecto>`
   - Aplica el `baseline` de `tsconfig-strictness` a `compilerOptions`. Solo escribe si el
     `tsconfig.json` es JSON limpio sin `extends`; si no, lista los flags para agregar a mano.
+- Aceptar la deuda actual (baseline): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --update-baseline --dir <proyecto>`
+  - Snapshotea TODOS los findings actuales en `.praxis-guard/baseline.json` (committealo). Desde
+    ahí, las corridas normales ocultan esos y muestran solo lo **nuevo**.
+- Ver todo (ignorar baseline): agregá `--no-baseline`.
 
 ## Proceso
 
@@ -26,6 +30,8 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
 3. Presentarle al usuario los findings priorizados; si hay muchos, agrupar por regla.
 4. Si aparece un finding de arquitectura y el proyecto aún no declaró estrategia
    (`architecture.strategy`), sugerir la skill `praxis-config`.
+5. Si el audit avisa que hay findings de la baseline ya resueltos, sugerí `--update-baseline`
+   para limpiarlos (evita que una regresión futura quede oculta por una huella huérfana).
 
 ## Estado
 

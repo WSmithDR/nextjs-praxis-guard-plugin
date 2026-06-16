@@ -38,6 +38,11 @@ El estado vive en `.praxis-guard/meta.json` (`last_audited_commit`, `rules_finge
 te ofrece correr `praxis-config`. El pre-commit por default **avisa sin bloquear**; activá
 el bloqueo con `"commit": { "block": true, "minSeverity": "warn" }`.
 
+Para adoptar el auditor en un repo con deuda existente: `praxis-audit --update-baseline` acepta
+los findings actuales en `.praxis-guard/baseline.json` (committealo); desde ahí solo verás los
+**nuevos**. `--no-baseline` muestra todo. El pre-commit también respeta la baseline (no bloquea
+por deuda ya aceptada, solo por findings nuevos).
+
 ## Configuración por proyecto
 
 La config vive en `.praxis-guard/config.json` (committeala — es config de equipo). Para
