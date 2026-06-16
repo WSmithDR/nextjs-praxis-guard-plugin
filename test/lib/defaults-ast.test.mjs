@@ -18,4 +18,7 @@ assert.equal(d.rules['as-const-opportunity'].enabled, true);
 assert.equal(d.rules['prefer-discriminated-union'].enabled, false, 'experimental, default off');
 assert.equal(d.rules['prefer-branded-type'].enabled, false, 'experimental, default off');
 
+assert.equal(d.rules['tailwind-arbitrary-has-token'].enabled, true);
+assert.equal(d.rules['tailwind-off-theme-value'].enabled, false, 'experimental, default off');
+
 console.log('defaults-ast.test ok');

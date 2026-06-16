@@ -35,6 +35,8 @@
     "prefer-satisfies": { "enabled": true, "minProps": 1 },
     "as-const-opportunity": { "enabled": true },
     "prefer-discriminated-union": { "enabled": false, "minMembers": 2 },
-    "prefer-branded-type": { "enabled": false, "pattern": "(Id|Token|Key|Uuid|Hash)$" }
+    "prefer-branded-type": { "enabled": false, "pattern": "(Id|Token|Key|Uuid|Hash)$" },
+    "tailwind-arbitrary-has-token": { "enabled": true },
+    "tailwind-off-theme-value": { "enabled": false }
   }
 }

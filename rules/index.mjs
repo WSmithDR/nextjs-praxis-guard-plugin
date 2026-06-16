@@ -26,6 +26,8 @@ import preferSatisfies from './prefer-satisfies.mjs';
 import asConstOpportunity from './as-const-opportunity.mjs';
 import preferDiscriminatedUnion from './prefer-discriminated-union.mjs';
 import preferBrandedType from './prefer-branded-type.mjs';
+import tailwindArbitraryHasToken from './tailwind-arbitrary-has-token.mjs';
+import tailwindOffThemeValue from './tailwind-off-theme-value.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -67,4 +69,6 @@ export const AST_RULES = {
   'as-const-opportunity': asConstOpportunity,
   'prefer-discriminated-union': preferDiscriminatedUnion,
   'prefer-branded-type': preferBrandedType,
+  'tailwind-arbitrary-has-token': tailwindArbitraryHasToken,
+  'tailwind-off-theme-value': tailwindOffThemeValue,
 };

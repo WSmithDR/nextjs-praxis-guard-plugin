@@ -47,6 +47,9 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
    - **Reglas Tailwind** (autodetect si hay `tailwind.config.*`): `tailwind-arbitrary-values`
      (`allow`), `tailwind-classname-bloat` (`maxClasses`), `tailwind-conditional-concat`,
      `tailwind-duplicate-utilities`.
+   - **Tailwind theme-aware (AST, `--deep`):** `tailwind-arbitrary-has-token` (prendida; sugiere el
+     token del theme cuando un valor arbitrario lo matchea) y `tailwind-off-theme-value`
+     (experimental, off). Parsean `tailwind.config` estáticamente; solo tokens del proyecto.
    - **`commit`**: `{ check, block, minSeverity }` — controla el pre-commit (avisa por
      default; `block: true` aborta el commit si hay findings ≥ `minSeverity`).
    - **Reglas custom** (`.praxis-guard/rules/<id>.mjs`): si el proyecto tiene reglas propias, sus

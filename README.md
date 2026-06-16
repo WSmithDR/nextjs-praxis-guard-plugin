@@ -71,6 +71,17 @@ Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `classN
 | `tailwind-conditional-concat` | `className={'p-4 '+(x?'a':'')}` → usá `clsx`/`cn` (se rompe con el purge). |
 | `tailwind-duplicate-utilities` | Clases duplicadas o contradictorias (`p-2 p-4`, `flex block`). |
 
+### Theme-aware (AST, modo profundo `--deep`)
+
+Parsean el `tailwind.config.*` **estáticamente** (sin ejecutarlo) y validan contra los tokens
+**declarados por el proyecto** (`theme`/`theme.extend`; no los defaults built-in de Tailwind).
+Cubren v3 / config con archivo; v4 CSS-only (`@theme`) es follow-up.
+
+| Regla | Qué detecta | Default |
+|-------|-------------|---------|
+| `tailwind-arbitrary-has-token` | Valor arbitrario que coincide con un token tuyo: `bg-[#1a1a1a]` con `colors.brand='#1a1a1a'` → usá `bg-brand`. | on |
+| `tailwind-off-theme-value` | Valor arbitrario de color/spacing que no está en tu theme. Ruidosa. | **off** (experimental) |
+
 ### Fixer de tsconfig (opt-in)
 
 `node bin/praxis-audit.mjs --fix-tsconfig --dir <proyecto>` aplica el `baseline` de
