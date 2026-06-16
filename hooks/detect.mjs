@@ -5,9 +5,10 @@ import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { isInScope } from '../lib/scope.mjs';
 import { formatFindings } from '../lib/findings.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
+import { loadCustomRules } from '../lib/custom-rules.mjs';
 
 // runDetector(filePath, { content?, config? }) -> { findings, text }
-export function runDetector(filePath, { content, config } = {}) {
+export function runDetector(filePath, { content, config, customFileRules } = {}) {
   const cfg = config || loadConfig({ projectConfigPath: defaultProjectConfigPath() });
   if (!cfg.detected) {
     try { cfg.detected = detectStack(process.cwd()); } catch { cfg.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
@@ -21,7 +22,8 @@ export function runDetector(filePath, { content, config } = {}) {
   }
 
   const findings = [];
-  for (const [id, fn] of Object.entries(RULES)) {
+  const allFileRules = { ...(customFileRules || {}), ...RULES };  // built-in gana en colisión
+  for (const [id, fn] of Object.entries(allFileRules)) {
     const ruleCfg = (cfg.rules && cfg.rules[id]) || {};
     if (ruleCfg.enabled === false) continue;
     try {
@@ -35,12 +37,15 @@ export function runDetector(filePath, { content, config } = {}) {
 // CLI entry: `node hooks/detect.mjs <file>` -> prints warnings (exit 0 always).
 const isMain = process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
 if (isMain) {
-  const file = process.argv[2];
-  if (file) {
-    try {
-      const { text } = runDetector(file);
-      if (text) process.stdout.write(text + '\n');
-    } catch { /* never fail the caller */ }
-  }
-  process.exit(0);
+  (async () => {
+    const file = process.argv[2];
+    if (file) {
+      try {
+        const custom = await loadCustomRules(process.cwd());
+        const { text } = runDetector(file, { customFileRules: custom.fileRules });
+        if (text) process.stdout.write(text + '\n');
+      } catch { /* never fail the caller */ }
+    }
+    process.exit(0);
+  })();
 }

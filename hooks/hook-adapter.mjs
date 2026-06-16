@@ -3,6 +3,7 @@
 // Reads CLI JSON on stdin, runs the detector, emits the CLI's additionalContext envelope.
 // ALWAYS exits 0. Never throws to the caller.
 import { runDetector } from './detect.mjs';
+import { loadCustomRules } from '../lib/custom-rules.mjs';
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -44,7 +45,8 @@ function envelope(cli, text) {
     const evt = raw ? JSON.parse(raw) : {};
     const filePath = extractPath(evt);
     if (!filePath) return;
-    const { text } = runDetector(filePath);
+    const custom = await loadCustomRules(process.cwd());
+    const { text } = runDetector(filePath, { customFileRules: custom.fileRules });
     if (text) process.stdout.write(envelope(cli, text));
   } catch {
     /* swallow everything: warn-only, never break the edit */
