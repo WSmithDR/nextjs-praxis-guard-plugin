@@ -35,4 +35,12 @@ const t3 = parseTailwindTheme(ts, cfg3);
 assert.equal(t3.colors.size, 0);
 assert.equal(parseTailwindTheme(ts, join(dir, 'nope.js')), null);
 
+// robustez: spreads, funciones y require en el theme se saltean sin romper; solo sobrevive el literal.
+const cfg4 = join(dir, 'tw4.js');
+writeFileSync(cfg4, `const base = require('x');
+module.exports = { theme: { extend: { colors: { ...base, ok: '#123456', fn: () => '#000' } } } };`);
+const t4 = parseTailwindTheme(ts, cfg4);
+assert.equal(t4.colors.get('#123456'), 'ok', 'sobrevive el literal');
+assert.equal(t4.colors.size, 1, 'spread/función se saltearon');
+
 console.log('tailwind-theme.test ok');
