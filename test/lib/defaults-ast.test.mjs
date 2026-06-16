@@ -13,4 +13,9 @@ for (const id of ['type-duplicate-shape', 'inline-shape-extract', 'schema-type-r
 assert.equal(d.rules['type-duplicate-shape'].minProps, 2);
 assert.equal(d.rules['magic-literal-repeated'].minFiles, 3);
 
+assert.equal(d.rules['prefer-satisfies'].enabled, true);
+assert.equal(d.rules['as-const-opportunity'].enabled, true);
+assert.equal(d.rules['prefer-discriminated-union'].enabled, false, 'experimental, default off');
+assert.equal(d.rules['prefer-branded-type'].enabled, false, 'experimental, default off');
+
 console.log('defaults-ast.test ok');

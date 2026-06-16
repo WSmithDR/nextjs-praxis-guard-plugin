@@ -43,6 +43,23 @@ unions/enums, `as const`.
 | `prefer-as-const` | por-archivo | Objeto-mapa de constantes sin `as const` (perdés el narrowing). |
 | `tsconfig-strictness` | proyecto | El `tsconfig` no fuerza el `baseline` de estrictez elegido (default `["strict","noImplicitAny"]`). Tiene fixer opt-in (abajo). |
 
+### Reglas TypeScript con AST (modo profundo `--deep`)
+
+Usan el type-checker del proyecto (el `typescript` que ya tenés instalado) — por eso corren solo en
+la auditoría profunda (`praxis-audit --deep`), nunca en el hook. Todas `info`.
+
+| Regla | Qué detecta | Default |
+|-------|-------------|---------|
+| `type-duplicate-shape` | Un tipo que repite (o es superset de) otro en otro archivo → `Pick`/`Omit` o unificar. | on |
+| `inline-shape-extract` | Forma de objeto inline que coincide con un `type` con nombre → referencialo. | on |
+| `schema-type-redeclare` | Un `type` a mano que duplica un schema Zod → `z.infer<typeof X>`. | on |
+| `prefer-satisfies` | `const x: T = {…}` que ensancha los literales → `{…} satisfies T`. | on |
+| `as-const-opportunity` | Literal usado como fuente de union (`typeof X[number]`) sin `as const`. | on |
+| `prefer-discriminated-union` | Union de objetos sin campo discriminante literal común. Config: `minMembers`. | **off** (experimental) |
+| `prefer-branded-type` | Alias de primitivo con nombre de identidad (`*Id`/`*Token`/…) → branded type. Config: `pattern`. | **off** (experimental) |
+
+Las experimentales se prenden a demanda en la config (`rules.<id>.enabled: true`).
+
 ## Reglas Tailwind (autodetect)
 
 Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `className`.
