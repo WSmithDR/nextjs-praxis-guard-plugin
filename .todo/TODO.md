@@ -3,44 +3,39 @@
 > MVP: hook `PostToolUse` que detecta malas praxis en Next.js y **avisa sin bloquear**.
 > Diseño completo en `docs/specs/2026-06-12-mvp-praxis-hooks-design.md` (leer primero).
 > Multi-CLI vía el meta-plugin `cli-plugin-template`.
+>
+> **Estado (2026-06-15):** MVP + 4 features mergeadas a `main` y pusheadas a `origin`:
+> (1) reglas de arquitectura + drift + auditoría con disparadores; (2) reglas TS/Tailwind
+> Fase 1; (3) baseline/suppress; (4) reglas custom por proyecto. 51/51 tests verdes.
+> El MVP (Q1-Q3 originales) está completo — movido a `.todo/DONE.md`.
 
-## Q1 — Importante + Urgente (arrancar acá)
+## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Scaffold con `cli-plugin-template`** — invocar el meta-plugin para generar la
-      estructura multi-CLI del plugin (manifest, hooks dir, compat Claude Code /
-      Copilot / Gemini / Codex). Skill: `cli-plugin-template:plugin-dev` o
-      `plugin-feature`.
-- [ ] **Plan de implementación** — invocar `superpowers:writing-plans` tomando el spec
-      como entrada, para detallar pasos + checkpoints de review.
-- [ ] **Registrar el plugin en el registry de evolución** — `cli-plugin-template:plugin-register`
-      para que el meta-plugin administre su crecimiento (igual que los otros plugins).
-
-## Q2 — Importante + No urgente (el grueso de la construcción)
-
-- [ ] **Interfaz común de regla** — definir el contrato `(content, path, config) => Finding[]`
-      y el tipo `Finding` (rule, line?, message, severity 'info'|'warn').
-- [ ] **Orquestador `hooks/detect.mjs`** — lee archivo editado + config, corre reglas
-      habilitadas, arma `additionalContext`. Node `.mjs` sin dependencias. Nunca rompe
-      la edición (exit 0 ante error, timeout corto).
-- [ ] **`hooks/hooks.json`** — registrar `PostToolUse` sobre Write|Edit|MultiEdit.
-- [ ] **Regla `secrets`** *(determinístico)* — API keys/tokens/connection strings
-      hardcodeados. (La más fácil y de mayor valor; buena primera regla.)
-- [ ] **Regla `hardcoded-data`** *(determinístico)* — literales grandes de datos de
-      dominio en `.tsx`. Dolor #1 del autor.
-- [ ] **Regla `forbidden-imports`** *(determinístico, configurable)* — lista por-proyecto,
-      vacía por defecto.
-- [ ] **Regla `file-responsibility`** *(híbrido)* — umbral de líneas (default 400) +
-      señales de mezcla; inyecta nudge de auto-reflexión al agente.
-- [ ] **Config `config/defaults.json`** + carga de `.claude/nextjs-praxis-guard.json`
-      por proyecto (toggles, umbrales, forbidden-imports).
-- [ ] **Tests** — `test/fixtures/` (buenas y malas por regla) + `test/run.mjs` que
-      verifica detección y ausencia de falsos positivos en las buenas.
-
-## Q3 — No tan importante + algo urgente
-
-- [ ] **README** — completar con instalación multi-CLI, config, ejemplos de findings.
-- [ ] **Probarlo de verdad** sobre Eminat App (`lib/AppContext.tsx` es el caso de
-      prueba perfecto: `MARCAS_LIST`, `MIEMBROS_REFS`, `SOLICITANTES`).
+- [ ] **Fase 2 TS con AST (`Pick`/`Omit`/derivación de tipos)** — las reglas de *reuso real*
+      de tipos cruzando archivos (sugerir `Pick<Otro, ...>`/`Omit`, derivar en vez de duplicar)
+      necesitan el type-checker de TS (no se hace honesto con regex). Implica dependencia
+      `typescript` + una nueva clase de **"ast rule"** que corra solo en la auditoría (lenta).
+      Es la continuación natural del grupo `typescript` (Fase 1 ya mergeada). _(creado por: SmithDR · 2026-06-15)_
+- [ ] **Salida SARIF + GitHub Action** — `praxis-audit --format sarif` + un workflow de CI que
+      corre el audit y comenta el PR (code scanning). Saca el plugin del loop del agente y lo
+      lleva al pipeline. Bajo esfuerzo (el motor ya devuelve findings estructurados). _(creado por: SmithDR · 2026-06-15)_
+- [ ] **Plan B: neutralizar secretos fake de los tests para esquivar GitHub push protection** —
+      los fixtures/tests usan `sk_live_…` con formato real (necesario: es un detector de secretos),
+      y GitHub los marca como "Stripe API Key" en cada push (hoy se resolvió permitiéndolos a mano).
+      Fix durable: acortar los fakes a <24 chars (siguen matcheando la regla, que pide 16+, pero
+      esquivan el detector de Stripe de GitHub que pide 24+). Requiere reescribir el historial o
+      aplicarlo de acá en más. _(creado por: SmithDR · 2026-06-15)_
+- [ ] **Aprovechar a fondo TS + Tailwind para "código bien logrado"** — profundizar los dos grupos
+      más allá de Fase 1, hacia reglas que *empujen activamente* hacia código idiomático y de calidad:
+      - **Tailwind:** premiar/sugerir el uso de los **objetos y clases custom del proyecto** (tokens
+        del `tailwind.config` theme, utilities propias, `@apply`, componentes con `cva`/`tailwind-variants`)
+        en vez de valores sueltos — leyendo el theme para validar contra la paleta/spacing reales
+        (extiende `tailwind-arbitrary-values`, que hoy solo detecta el patrón sin parsear el theme).
+      - **TypeScript:** guiar el aprovechamiento de todas las bondades del sistema de tipos
+        (utility types, generics, discriminated unions, `satisfies`, branded types, `as const`,
+        inferencia desde schemas Zod/Valibot, etc.) para código mejor tipado y reutilizable.
+      Engancha con la Fase 2 AST (lo más profundo necesita el type-checker) y con leer `tailwind.config`.
+      _(creado por: SmithDR · 2026-06-15)_
 
 ## Q4 — Backlog / futuro (NO en v1)
 
