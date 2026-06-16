@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
 import { RULES, PROJECT_RULES } from '../rules/index.mjs';
+import { loadCustomRules } from '../lib/custom-rules.mjs';
 
 function isNextProject(cwd) {
   if (existsSync(join(cwd, 'next.config.js')) ||
@@ -30,6 +31,7 @@ function driftMarkerPath(cwd) {
   return join(tmpdir(), `praxis-guard-drift-${h}`);
 }
 
+(async () => {
 try {
   const cwd = process.cwd();
   if (isNextProject(cwd)) {
@@ -51,7 +53,8 @@ try {
         const m = JSON.parse(readFileSync(join(cwd, '.praxis-guard', 'meta.json'), 'utf8'));
         if (Array.isArray(m.reviewed_rules)) reviewed = m.reviewed_rules;
       } catch { reviewed = null; }
-      const registered = [...Object.keys(RULES), ...Object.keys(PROJECT_RULES)];
+      const custom = await loadCustomRules(cwd);
+      const registered = [...Object.keys(RULES), ...Object.keys(PROJECT_RULES), ...Object.keys(custom.fileRules), ...Object.keys(custom.projectRules)];
       const unreviewed = reviewed === null ? [] : registered.filter((id) => !reviewed.includes(id));
       if (unreviewed.length > 0) {
         const marker = driftMarkerPath(cwd);
@@ -67,3 +70,4 @@ try {
   }
 } catch { /* never block the session */ }
 process.exit(0);
+})();

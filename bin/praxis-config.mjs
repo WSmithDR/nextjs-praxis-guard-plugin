@@ -81,7 +81,7 @@ if (cmd === 'write') {
     configured_at: new Date().toISOString().slice(0, 10),
     plugin_version: pluginVersion(),
     schema_version: 1,
-    reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES)].sort(),
+    reviewed_rules: [...Object.keys(RULES), ...Object.keys(PROJECT_RULES), ...customIds].sort(),
     rules_fingerprint: rulesFingerprint(merged, readCustomRuleSources(dir)),
   });
   console.log(`praxis-config: escrito ${configPath}`);
