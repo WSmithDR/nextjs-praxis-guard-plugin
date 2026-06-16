@@ -38,4 +38,12 @@ const shuffled = [findings[2], findings[0], findings[1]];
 assert.equal(JSON.stringify(toSarif(findings, { toolName: 'x', toolVersion: '1' })),
              JSON.stringify(toSarif(shuffled, { toolName: 'x', toolVersion: '1' })));
 
+// orden total: dos findings idénticos salvo severity -> reordenar la entrada no cambia la salida.
+const tie = [
+  { rule: 'r', file: 'f.ts', line: 1, severity: 'error', message: 'm' },
+  { rule: 'r', file: 'f.ts', line: 1, severity: 'info', message: 'm' },
+];
+assert.equal(JSON.stringify(toSarif(tie, { toolName: 'x', toolVersion: '1' })),
+             JSON.stringify(toSarif([tie[1], tie[0]], { toolName: 'x', toolVersion: '1' })));
+
 console.log('sarif.test ok');
