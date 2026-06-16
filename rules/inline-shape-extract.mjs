@@ -1,6 +1,6 @@
 // rules/inline-shape-extract.mjs
 // AST rule: object-type inline cuya forma == un named type existente -> referenciarlo.
-import { shapeOf, sameShape } from '../lib/ast-shapes.mjs';
+import { shapeOf, sameShape, collectNamedShapes } from '../lib/ast-shapes.mjs';
 
 export const meta = { kind: 'ast' };
 
@@ -8,21 +8,13 @@ export default function inlineShapeExtract(ctx, full = {}) {
   const cfg = (full.rules && full.rules['inline-shape-extract']) || {};
   if (cfg.enabled === false) return [];
   const minProps = cfg.minProps ?? 2;
+  if (!ctx || !ctx.checker) return [];
   const { ts, checker, sourceFiles, rel } = ctx;
 
   // 1. catálogo de named types con su forma.
-  const named = [];   // { name, shape }
-  for (const sf of sourceFiles) {
-    ts.forEachChild(sf, function visit(node) {
-      if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name) {
-        const shape = shapeOf(ts, checker, checker.getTypeAtLocation(node.name), node);
-        if (shape.size >= minProps) named.push({ name: node.name.text, shape });
-      }
-      ts.forEachChild(node, visit);
-    });
-  }
+  const named = collectNamedShapes(ctx, minProps);
 
-  // 2. TypeLiterals inline (no el cuerpo de un `type X = {...}`) que igualen un named type.
+  // 2. TypeLiterals inline (no el cuerpo directo de un `type X = {...}`; los anidados sí se inspeccionan) que igualen un named type.
   const out = [];
   for (const sf of sourceFiles) {
     ts.forEachChild(sf, function visit(node) {

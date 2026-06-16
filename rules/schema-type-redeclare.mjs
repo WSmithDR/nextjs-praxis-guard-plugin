@@ -10,6 +10,7 @@ export default function schemaTypeRedeclare(ctx, full = {}) {
   const cfg = (full.rules && full.rules['schema-type-redeclare']) || {};
   if (cfg.enabled === false) return [];
   const minProps = cfg.minProps ?? 2;
+  if (!ctx || !ctx.checker) return [];
   const { ts, checker, sourceFiles, rel } = ctx;
 
   // 0. ¿el proyecto importa zod? si no, no-op.

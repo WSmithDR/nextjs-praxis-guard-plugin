@@ -1,32 +1,36 @@
 // rules/type-duplicate-shape.mjs
-// AST rule: un type/interface es superset de otro (otro archivo) -> sugerir Pick/Omit.
-import { shapeOf, isSuperset } from '../lib/ast-shapes.mjs';
+// AST rule: detecta reuso de tipos cruzando archivos. Dos casos:
+//  - duplicado EXACTO (misma forma, distinto archivo) -> sugerir unificar.
+//  - superset estricto (A contiene todas las props de B y más) -> sugerir Pick/Omit.
+import { collectNamedShapes, isSuperset, sameShape } from '../lib/ast-shapes.mjs';
 
 export const meta = { kind: 'ast' };
 
 export default function typeDuplicateShape(ctx, full = {}) {
   const cfg = (full.rules && full.rules['type-duplicate-shape']) || {};
   if (cfg.enabled === false) return [];
+  if (!ctx || !ctx.checker) return [];
   const minProps = cfg.minProps ?? 2;
-  const { ts, checker, sourceFiles, rel } = ctx;
 
-  // 1. juntar todas las declaraciones de tipo con nombre y su forma.
-  const decls = [];   // { name, file, line, shape }
-  for (const sf of sourceFiles) {
-    ts.forEachChild(sf, function visit(node) {
-      if ((ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) && node.name) {
-        const shape = shapeOf(ts, checker, checker.getTypeAtLocation(node.name), node);
-        if (shape.size >= minProps) {
-          const { line } = sf.getLineAndCharacterOfPosition(node.name.getStart());
-          decls.push({ name: node.name.text, file: rel(sf.fileName), line: line + 1, shape });
-        }
+  const decls = collectNamedShapes(ctx, minProps);   // orden estable
+  const out = [];
+
+  // 1. duplicados exactos cross-file: una vez por par (i<j) gracias al orden estable.
+  for (let i = 0; i < decls.length; i++) {
+    for (let j = i + 1; j < decls.length; j++) {
+      const a = decls[i], b = decls[j];
+      if (a.file === b.file) continue;
+      if (sameShape(a.shape, b.shape)) {
+        out.push({
+          rule: 'type-duplicate-shape', severity: 'info', file: b.file, line: b.line,
+          message: `"${b.name}" tiene la misma forma que "${a.name}" (${a.file}). Considerá unificarlos en un solo type (type ${b.name} = ${a.name}).`,
+        });
       }
-      ts.forEachChild(node, visit);
-    });
+    }
   }
 
-  // 2. para cada A, el mejor B (otro archivo) cuyo set es subset de A.
-  const out = [];
+  // 2. superset estricto: reportamos el mayor B (otro archivo) como base de un Pick/Omit.
+  //    Empates de tamaño: gana el primero en orden estable (decls ya viene ordenado).
   for (const a of decls) {
     let best = null;
     for (const b of decls) {

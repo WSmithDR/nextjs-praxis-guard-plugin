@@ -15,4 +15,12 @@ assert.match(out[0].message, /Pick<Contact/);
 
 assert.equal(rule(ctx, { rules: { 'type-duplicate-shape': { enabled: false } } }).length, 0);
 
+// exact duplicate cross-file -> 1 finding sugiriendo unificar; Widget (no relacionado) queda en silencio.
+const ctxExact = await buildContextFor('type-duplicate-exact');
+const outExact = rule(ctxExact, { rules: { 'type-duplicate-shape': { enabled: true, minProps: 2 } } });
+assert.equal(outExact.length, 1, `exact got ${outExact.length}`);
+assert.ok(outExact[0].file.endsWith('b.ts'), `exact file=${outExact[0].file}`);
+assert.match(outExact[0].message, /misma forma/);
+assert.match(outExact[0].message, /type Account = Person/);
+
 console.log('type-duplicate-shape.test ok');
