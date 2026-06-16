@@ -22,6 +22,10 @@ import typeDuplicateShape from './type-duplicate-shape.mjs';
 import inlineShapeExtract from './inline-shape-extract.mjs';
 import schemaTypeRedeclare from './schema-type-redeclare.mjs';
 import magicLiteralRepeated from './magic-literal-repeated.mjs';
+import preferSatisfies from './prefer-satisfies.mjs';
+import asConstOpportunity from './as-const-opportunity.mjs';
+import preferDiscriminatedUnion from './prefer-discriminated-union.mjs';
+import preferBrandedType from './prefer-branded-type.mjs';
 
 // File rules: (content, filePath, ruleConfig, fullConfig) => Finding[]
 // Corren en el hook PostToolUse y, por archivo, en la auditoría.
@@ -59,4 +63,8 @@ export const AST_RULES = {
   'type-duplicate-shape': typeDuplicateShape,
   'inline-shape-extract': inlineShapeExtract,
   'schema-type-redeclare': schemaTypeRedeclare,
+  'prefer-satisfies': preferSatisfies,
+  'as-const-opportunity': asConstOpportunity,
+  'prefer-discriminated-union': preferDiscriminatedUnion,
+  'prefer-branded-type': preferBrandedType,
 };

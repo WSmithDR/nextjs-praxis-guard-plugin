@@ -31,6 +31,10 @@
     "type-duplicate-shape": { "enabled": true, "minProps": 2 },
     "inline-shape-extract": { "enabled": true, "minProps": 2 },
     "schema-type-redeclare": { "enabled": true, "minProps": 2 },
-    "magic-literal-repeated": { "enabled": true, "minFiles": 3, "minLen": 4 }
+    "magic-literal-repeated": { "enabled": true, "minFiles": 3, "minLen": 4 },
+    "prefer-satisfies": { "enabled": true, "minProps": 1 },
+    "as-const-opportunity": { "enabled": true },
+    "prefer-discriminated-union": { "enabled": false, "minMembers": 2 },
+    "prefer-branded-type": { "enabled": false, "pattern": "(Id|Token|Key|Uuid|Hash)$" }
   }
 }
