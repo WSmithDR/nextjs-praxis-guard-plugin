@@ -16,6 +16,7 @@ import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { readMeta, writeMeta } from '../lib/meta.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
+import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -51,6 +52,18 @@ if (process.argv.includes('--fix-tsconfig')) {
   console.log(res.written
     ? `praxis-audit: tsconfig.json actualizado — agregados: ${res.missing.join(', ')}`
     : 'praxis-audit: nada que cambiar en tsconfig.json.');
+  process.exit(0);
+}
+
+if (process.argv.includes('--update-baseline')) {
+  const files = enumerateFiles(dir, config);
+  const all = [...runFileRules(files), ...runProjectRules()];
+  const fps = [...new Set(all.map(findingFingerprint))];
+  const old = readBaseline(dir);
+  const oldSet = new Set(old ? old.fingerprints : []);
+  const resolved = [...oldSet].filter((x) => !fps.includes(x)).length;
+  writeBaseline(dir, fps, { created_at: new Date().toISOString().slice(0, 10), plugin_version: pluginVersion() });
+  console.log(`praxis-audit: baseline actualizada — ${fps.length} aceptados (${resolved} resueltos salieron).`);
   process.exit(0);
 }
 
