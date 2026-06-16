@@ -1,0 +1,30 @@
+name: praxis-guard
+on: pull_request
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - name: clone praxis-guard plugin
+        # El ref __PLUGIN_REF__ asume un tag publicado en el repo del plugin; si no existe, cambialo por 'main'.
+        # Repo privado: usá https con ${{ secrets.PRAXIS_PLUGIN_TOKEN }} en la URL (ver README).
+        run: git clone --depth 1 --branch __PLUGIN_REF__ __PLUGIN_URL__ "$RUNNER_TEMP/praxis-plugin"
+      - name: praxis-audit
+        id: audit
+        continue-on-error: true
+        run: node "$RUNNER_TEMP/praxis-plugin/bin/praxis-audit.mjs" --full --deep --format sarif --gate > praxis.sarif
+      - name: upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: praxis.sarif
+      - name: gate
+        if: steps.audit.outcome == 'failure'
+        run: exit 1

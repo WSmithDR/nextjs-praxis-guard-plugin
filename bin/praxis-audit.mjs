@@ -19,6 +19,8 @@ import { buildTsContext } from '../lib/ts-program.mjs';
 import { applyFix, computeMissing } from '../lib/tsconfig-fix.mjs';
 import { findingFingerprint, readBaseline, writeBaseline, applyBaseline } from '../lib/baseline.mjs';
 import { loadCustomRules, readCustomRuleSources } from '../lib/custom-rules.mjs';
+import { toSarif } from '../lib/sarif.mjs';
+import { gateExitCode } from '../lib/gate.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -34,8 +36,11 @@ const dir = resolve(arg('dir', process.cwd()));
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
 try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
 
+const format = arg('format', 'human');
+const note = (m) => (format === 'sarif' ? console.error(m) : console.log(m));
+
 const custom = await loadCustomRules(dir);
-for (const e of custom.errors) console.log(`⚠ regla custom "${e.id}" no cargó: ${e.error}`);
+for (const e of custom.errors) note(`⚠ regla custom "${e.id}" no cargó: ${e.error}`);
 
 if (process.argv.includes('--fix-tsconfig')) {
   const det = config.detected || {};
@@ -136,7 +141,7 @@ function anyAstRunsOnFull() {
 async function runAstRules() {
   const astCtx = await buildTsContext(dir, config);
   if (!astCtx) {
-    console.log('praxis-audit: reglas AST omitidas — typescript no está instalado en el proyecto.');
+    note('praxis-audit: reglas AST omitidas — typescript no está instalado en el proyecto.');
     return [];
   }
   const findings = [];
@@ -203,15 +208,19 @@ if (deep || (mode === 'full' && anyAstRunsOnFull())) {
 const baseline = process.argv.includes('--no-baseline') ? null : readBaseline(dir);
 const { shown, suppressed, resolvedCount } = applyBaseline(findings, baseline);
 
-report(shown);
+if (format === 'sarif') {
+  process.stdout.write(JSON.stringify(toSarif(shown, { toolName: 'nextjs-praxis-guard', toolVersion: ver })) + '\n');
+} else {
+  report(shown);
+}
 const modeStr = `modo ${mode}${ranProject ? ' (con project rules)' : ''}`;
 if (baseline) {
-  console.log(`praxis-audit: ${shown.length} nuevo(s), ${suppressed.length} ocultos por baseline. ${modeStr}.`);
+  note(`praxis-audit: ${shown.length} nuevo(s), ${suppressed.length} ocultos por baseline. ${modeStr}.`);
   if (mode === 'full' && resolvedCount > 0) {
-    console.log(`ℹ ${resolvedCount} findings de la baseline ya están resueltos — corré --update-baseline para limpiarlos.`);
+    note(`ℹ ${resolvedCount} findings de la baseline ya están resueltos — corré --update-baseline para limpiarlos.`);
   }
 } else {
-  console.log(`praxis-audit: ${modeStr}.`);
+  note(`praxis-audit: ${modeStr}.`);
 }
 
 // staged NO avanza el estado (el commit aún no ocurrió).
@@ -220,14 +229,10 @@ if (mode !== 'staged') {
   if (h) writeMeta(dir, { last_audited_commit: h, rules_fingerprint: fp, plugin_version: ver });
 }
 
-// Bloqueo de commit configurable.
+// Gate de exit code: pre-commit (commit.block en --staged) o --gate (CI).
+const gate = process.argv.includes('--gate');
 let exitCode = 0;
-if (mode === 'staged') {
-  const commitCfg = config.commit || {};
-  if (commitCfg.block) {
-    const rank = { info: 1, warn: 2, error: 3 };
-    const min = rank[commitCfg.minSeverity] || 2;
-    if (shown.some((f) => (rank[f.severity] || 1) >= min)) exitCode = 1;
-  }
+if (gate || (mode === 'staged' && (config.commit || {}).block)) {
+  exitCode = gateExitCode(shown, config);
 }
 process.exit(exitCode);
