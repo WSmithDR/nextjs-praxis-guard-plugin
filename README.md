@@ -191,6 +191,42 @@ El workflow clona el plugin a un **ref fijado** (`v<version>`, inyectado al inst
 Para otros CI: `praxis-audit --format sarif` emite SARIF 2.1.0 a stdout (estándar neutral) y
 `--gate` hace exit 1 según `commit.minSeverity`.
 
+### Actualizar la versión del plugin en CI
+
+El workflow clona el plugin a un **tag fijado** (`v<version>`) que quedó escrito en
+`.github/workflows/praxis-audit.yml` **del proyecto consumidor** al instalarlo. Ese tag **no se
+actualiza solo**: cuando sale una versión nueva del plugin, el CI sigue usando la vieja hasta que
+vos lo subas (es a propósito — CI reproducible). Para actualizarlo, en el **proyecto consumidor**:
+
+**Opción A — re-correr el instalador (recomendada).** Primero actualizá tu copia local del plugin a
+la versión que querés fijar (el instalador lee la `version` de esa copia), después:
+
+```bash
+node <ruta-al-plugin>/bin/install-hooks.mjs --cli github-action --target <proyecto>
+```
+
+Regenera `praxis-audit.yml` con el tag = la versión del plugin instalado.
+
+**Opción B — a mano.** Editá la línea del clone en `.github/workflows/praxis-audit.yml`:
+
+```yaml
+run: git clone --depth 1 --branch v0.24.4 <url> "$RUNNER_TEMP/praxis-plugin"
+#                                  ^^^^^^^ cambialo al tag nuevo
+```
+
+En ambos casos, lo que lo hace efectivo es commitear el workflow en el proyecto consumidor; el
+**próximo PR** ya corre con el tag nuevo:
+
+```bash
+git add .github/workflows/praxis-audit.yml
+git commit -m "ci: bump praxis-guard a vX.Y.Z"
+git push
+```
+
+> El tag debe **existir en el remoto del plugin** (`git tag vX.Y.Z && git push origin vX.Y.Z` en el
+> repo del plugin). Si fijás un tag inexistente, el `git clone --branch` del CI falla. Como el autobump
+> sube la versión por commit pero **no** crea tags, acordate de publicar el tag en cada release.
+
 ## Uso standalone
 
 Podés correr el detector a mano sobre cualquier archivo. Imprime el bloque de avisos (o nada

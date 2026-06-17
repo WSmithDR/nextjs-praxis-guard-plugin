@@ -1,5 +1,5 @@
 {
   "name": "nextjs-praxis-guard",
-  "version": "0.24.4",
+  "version": "0.24.5",
   "description": "Warn-only Next.js praxis guard (Copilot CLI)."
 }
