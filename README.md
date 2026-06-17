@@ -395,6 +395,25 @@ Cada línea es `[severity] regla[:línea] — mensaje` (el número de línea apa
 regla puede ubicar el problema; `file-responsibility` evalúa el archivo entero y lo omite).
 `[warn]` señala algo a corregir; `[info]` es un *nudge* de auto-reflexión.
 
+## Ciclo de vida de un finding (cómo se cierra)
+
+Cada superficie que recolecta hallazgos tiene su forma de marcarlos **resueltos** — ninguna acumula
+pendientes sin cierre:
+
+| Superficie | Cómo se cierra | Auto / manual |
+|-----------|----------------|---------------|
+| **Hook por-archivo** | Recomputa en cada edición: arreglás el código → el aviso no vuelve a aparecer. No guarda estado. | **Auto** (auto-sana) |
+| **Auditoría** (`praxis-audit`) | Recomputa en cada corrida: el finding desaparece solo cuando lo arreglás. | **Auto** |
+| **Pre-commit** | Recomputa por commit (respeta la baseline). | **Auto** |
+| **Baseline** (`baseline.json`, deuda aceptada) | El audit detecta las huellas que ya no aparecen (`resolvedCount`) y avisa *"N findings ya están resueltos — corré `--update-baseline`"*; ese comando las purga. | Detección **auto** + purga **manual** (es estado committeado del equipo) |
+| **Reglas sin revisar** (`meta.json` → `reviewed_rules`) | `SessionStart` nudgea las reglas registradas que no estén en `reviewed_rules`; correr **`praxis-config`** las marca todas revisadas → el nudge se apaga. | Detección **auto** + cierre al correr `praxis-config` |
+| **SARIF → GitHub code scanning** | GitHub auto-cierra la alerta cuando el finding desaparece del siguiente scan del PR. | **Auto** (lo maneja GitHub) |
+
+Las superficies **efímeras** (hook, audit, pre-commit) no guardan ledger: "resuelto" = el problema deja
+de detectarse. Las **persistentes** (baseline, `reviewed_rules`) detectan la resolución solas y te la
+muestran, pero el paso de finalizar es **manual a propósito** porque son estado committeado: no se
+reescriben sin que vos lo decidas.
+
 ## Límites conocidos (v1)
 
 La detección de v1 es **heurística basada en regex** (un detector basado en AST es una mejora
