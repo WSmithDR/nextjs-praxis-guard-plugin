@@ -144,19 +144,41 @@ Hay **dos formas de obtener el plugin**, según el CLI: por el **marketplace de 
 
 ### Claude Code (marketplace)
 
-El repo es su propio marketplace (`.claude-plugin/marketplace.json`). En Claude Code:
+El repo es su propio marketplace (`.claude-plugin/marketplace.json`). Hay **dos formas de tipear los
+comandos** según dónde estés:
 
-```
-/plugin marketplace add WSmithDR/nextjs-praxis-guard-plugin
-/plugin install nextjs-praxis-guard@nextjs-praxis-guard
+- **Dentro de una sesión de Claude Code** (el REPL): `/plugin marketplace add …`
+- **Desde la terminal** (bash): `claude plugin marketplace add …`
+
+(Son el mismo comando; `/plugin` **no** funciona en bash y `claude plugin` no funciona dentro del REPL.)
+Desde la terminal:
+
+```bash
+claude plugin marketplace add WSmithDR/nextjs-praxis-guard-plugin
+claude plugin install nextjs-praxis-guard@nextjs-praxis-guard --scope project
 ```
 
 `nextjs-praxis-guard@nextjs-praxis-guard` es `plugin@marketplace` (el repo aloja un único plugin con
-el mismo nombre). **Reiniciá la sesión** tras instalar: el plugin trae bundled `hooks/hooks.json`
-(`PostToolUse`), así que los hooks se cargan solos. Para quitarlo: `/plugin uninstall nextjs-praxis-guard`.
+el mismo nombre). `--scope project` lo instala para el proyecto donde estás parado (omitilo para
+instalarlo a nivel usuario). **Reiniciá la sesión** tras instalar: el plugin trae bundled
+`hooks/hooks.json` (`PostToolUse`), así que los hooks se cargan solos. Para quitarlo:
+`claude plugin uninstall nextjs-praxis-guard`.
 
-> El marketplace clona la rama por default del repo. Para fijar una versión, podés agregar el
-> marketplace desde un fork/tag, o instalar desde un checkout local con `/plugin marketplace add <ruta>`.
+#### Actualizar el plugin (refrescar el cache)
+
+El marketplace guarda un **clon local** del repo; `marketplace add` **no lo re-clona** si ya está en
+disco. Cuando sale una versión nueva, refrescá el cache **antes** de reinstalar:
+
+```bash
+claude plugin marketplace update nextjs-praxis-guard   # re-clona desde main
+claude plugin install nextjs-praxis-guard@nextjs-praxis-guard --scope project
+```
+
+Sin el `update`, seguís instalando la versión vieja del cache. (`remove` borra el marketplace;
+`delete` no existe.)
+
+> El marketplace clona la rama por default (`main`). Para fijar una versión, agregá el marketplace
+> desde un fork/tag o desde un checkout local con `claude plugin marketplace add <ruta>`.
 
 ### Otros CLIs (clonar el repo)
 
@@ -178,7 +200,7 @@ extensión de Gemini, no por este script. Ver abajo.
 Una vez obtenido el plugin (arriba), así se **activa el hook** en cada CLI:
 
 ### Claude Code
-Automático tras `/plugin install`. El hook `PostToolUse` viene en `hooks/hooks.json`. **Reiniciá la
+Automático tras instalar el plugin. El hook `PostToolUse` viene en `hooks/hooks.json`. **Reiniciá la
 sesión** para que Claude Code lo cargue.
 
 ### Gemini CLI
