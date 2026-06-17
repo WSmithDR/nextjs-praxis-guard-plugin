@@ -1,5 +1,5 @@
 {
   "name": "nextjs-praxis-guard",
-  "version": "0.16.2",
+  "version": "0.16.3",
   "description": "Warn-only Next.js praxis guard (Codex)."
 }
