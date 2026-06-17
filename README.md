@@ -60,6 +60,14 @@ la auditoría profunda (`praxis-audit --deep`), nunca en el hook. Todas `info`.
 
 Las experimentales se prenden a demanda en la config (`rules.<id>.enabled: true`).
 
+### Literal mágico repetido (project rule)
+
+| Regla | Clase | Qué detecta | Default |
+|-------|-------|-------------|---------|
+| `magic-literal-repeated` | proyecto | El mismo literal string/numérico repetido en **≥ `minFiles` archivos** distintos → extraé a una constante compartida. Config: `minFiles` (default 3), `minLen` (largo mínimo del literal, default 4). | on |
+
+Corre en la **auditoría** (es project-level: necesita ver todo el repo), no en el hook por-archivo.
+
 ## Reglas Tailwind (autodetect)
 
 Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `className`.
@@ -309,6 +317,69 @@ Para activar reglas de arquitectura, declarás la estrategia y configurás cada 
 }
 ```
 
+### Referencia de valores
+
+Cada regla acepta `"enabled": true|false`. Las que tienen parámetros:
+
+| Regla | Parámetro | Tipo / valores | Default |
+|-------|-----------|----------------|---------|
+| `hardcoded-data` | `minElements` | entero (tamaño mínimo del array para avisar) | `8` |
+| `forbidden-imports` | `list` | array de `{ "module": string, "message": string }` | `[]` |
+| `file-responsibility` | `maxLines` | entero (líneas para "archivo muy largo") | `400` |
+| | `mixedSignalsLines` | entero (umbral del nudge fetching+JSX) | `200` |
+| `untranslated-text` | `attributes` | array de nombres de atributo a vigilar | `["placeholder","title","alt","aria-label","label"]` |
+| | `ignore` | array de strings/regex a ignorar | `[]` |
+| `folder-placement` | `placement` | array de `{ "kind", "match" (regex), "allowed" (globs) }` | `[]` |
+| `layer-boundaries` | `layers` | array de `{ "name", "path", "mayImport": string[] }` | `[]` |
+| `server-client-boundaries` | `serverOnly` | array de módulos server-only | `["server-only","next/headers","fs","node:fs",…]` |
+| `feature-deps` | `publicEntry` | array de nombres de entrypoint público | `["index.ts","index.tsx"]` |
+| `repeated-object-shape` | `minProps` / `minRepeats` | enteros | `2` / `2` |
+| `stringly-typed` | `minLiterals` | entero | `2` |
+| `duplicate-literal-union` | `minMembers` / `minRepeats` | enteros | `2` / `2` |
+| `tsconfig-strictness` | `baseline` | array de flags de `compilerOptions` | `["strict","noImplicitAny"]` |
+| `tailwind-arbitrary-values` | `allow` | array de valores arbitrarios permitidos | `[]` |
+| `tailwind-classname-bloat` | `maxClasses` | entero | `12` |
+| `type-duplicate-shape` · `inline-shape-extract` · `schema-type-redeclare` | `minProps` | entero | `2` |
+| `magic-literal-repeated` | `minFiles` / `minLen` | enteros | `3` / `4` |
+| `prefer-satisfies` | `minProps` | entero | `1` |
+| `prefer-discriminated-union` | `minMembers` | entero | `2` |
+| `prefer-branded-type` | `pattern` | regex (sufijos de identidad) | `"(Id\|Token\|Key\|Uuid\|Hash)$"` |
+
+Knobs **globales** (fuera de `rules`):
+
+| Clave | Valores | Default |
+|-------|---------|---------|
+| `include` | array de extensiones que el linter mira | `[".ts",".tsx",".js",".jsx",".mjs",".cjs"]` |
+| `exclude` | array de carpetas a saltear | `["node_modules/",".next/","dist/","build/",".git/","coverage/"]` |
+| `architecture.strategy` | `null` · `"by-feature"` · `"by-layer"` (gate de las reglas de arquitectura) | `null` |
+| `architecture.root` / `featuresDir` / `sharedDirs` | rutas del proyecto | `"src"` / `"src/features"` / `["src/shared","src/lib"]` |
+| `commit.block` | `true\|false` (si el pre-commit aborta) | `false` |
+| `commit.minSeverity` | `"info"` · `"warn"` · `"error"` (umbral del gate / pre-commit) | `"warn"` |
+
+Knob **transversal** (en reglas AST): `"runOn"` acepta `"deep"` (default — corre solo en
+`praxis-audit --deep`) o `"full"` (corre también en la auditoría **completa** / CI, no solo a mano).
+Ej: `"type-duplicate-shape": { "runOn": "full" }`.
+
+### Cambiar la config y que se aplique
+
+**Cómo cambiarla** — dos vías:
+1. **Skill `praxis-config`** (recomendada): te pregunta qué reglas correr y con qué parámetros, y
+   escribe `.praxis-guard/config.json` por vos. En cualquier CLI con skills, invocala con
+   *"configurá praxis-guard"*.
+2. **A mano:** editás `.praxis-guard/config.json` (solo declarás lo que cambiás; deep-merge sobre
+   los defaults). Validá que sea JSON válido.
+
+**Cómo se re-lee** — el detector carga la config **fresca en cada corrida** (no la cachea):
+
+- **Hook por-archivo:** el cambio aplica en la **próxima edición**. No hace falta reiniciar la sesión
+  para cambios de **valores**. (Solo *instalar/quitar el hook* en sí —no sus valores— requiere
+  reiniciar la sesión en Claude Code, porque el CLI carga `hooks.json` al arrancar.)
+- **Auditoría (`praxis-audit`):** la próxima corrida ya usa los valores nuevos. Además, cambiar la
+  config de reglas mueve el `rules_fingerprint` en `.praxis-guard/meta.json`, así que el auditor
+  pasa solo a modo **completo** la próxima vez (re-evalúa todo el repo con los valores nuevos).
+
+No hay paso de "recargar" manual: guardás el JSON y el siguiente evento (edición o auditoría) ya lo aplica.
+
 ## Cómo leer un aviso
 
 Cuando el detector encuentra problemas, inyecta un bloque como este:
@@ -376,8 +447,11 @@ Subí `--threshold` si hay ruido; bajalo para casos más laxos.
 
 ## Desarrollo: versionado automático
 
-Un hook `post-commit` bumpea la versión de `.claude-plugin/plugin.json` en cada commit, según el
-prefijo del mensaje (conventional commits) — y mete el cambio en el **mismo** commit (amend):
+Un hook `post-commit` bumpea la versión en cada commit, según el prefijo del mensaje
+(conventional commits), y mete el cambio en el **mismo** commit (amend). La fuente de verdad es
+`.claude-plugin/plugin.json`; el bump delega en `bin/bump-version.py`, que **sincroniza todos los
+manifiestos por-CLI** (`.codex-plugin/plugin.json`, `.copilot-plugin/plugin.json`,
+`gemini-extension.json`) para que ninguno quede desfasado:
 
 | Prefijo | Bump |
 |---------|------|
@@ -395,5 +469,7 @@ Notas:
 - Bumpea en **cada** commit (no por release). Si un commit ya toca `plugin.json` a mano, lo saltea.
 - El guard de recursión (sentinel `.git/.version-bump-in-progress`) garantiza un único bump por commit
   aunque el `amend` re-dispare el hook.
+- `bin/bump-version.py` también sirve standalone: `--sync` propaga la versión canónica sin bumpear,
+  `--check` detecta drift entre manifiestos (útil en CI), `--set X.Y.Z` fija una versión exacta.
 - Flujo de release: commiteá con buen prefijo → la versión queda correcta → publicá el tag matching
   (`git tag vX.Y.Z && git push origin vX.Y.Z`), que es lo que el workflow de CI clona.
