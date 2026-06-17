@@ -11,13 +11,6 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Bug: autobump no sincroniza los manifiestos por-CLI** — el hook `post-commit`
-      (`bin/dev/git-hooks/post-commit`) solo bumpea `.claude-plugin/plugin.json`; los otros manifiestos con
-      versión (`.codex-plugin/plugin.json`, `.copilot-plugin/plugin.json`, `gemini-extension.json`,
-      `opencode.json`) quedaron en 0.1.0 y driftearon. Fix: que el hook sincronice TODOS los manifiestos
-      (o portar `bin/bump-version.py` del catálogo) + un re-sync de una pasada para alinearlos al actual.
-      _(creado por: SmithDR · 2026-06-16)_
-
 - [ ] **Tailwind v4 CSS-only (@theme) — detección + parseo** — el sub-proyecto B cubre config-file (v3 y
       v4 con archivo); un proyecto v4 CSS-puro (`@theme` en CSS, sin `tailwind.config.*`) hoy ni se detecta
       (`detect-stack` solo mira archivos de config). Extender la detección a escanear CSS (`@import "tailwindcss"`
