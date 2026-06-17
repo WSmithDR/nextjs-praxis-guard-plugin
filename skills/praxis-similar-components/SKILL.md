@@ -21,3 +21,8 @@ Encuentra grupos de componentes con estructura JSX parecida (candidatos a unific
 ## Reglas
 - El reporte es best-effort (estructura JSX + hooks, no semántica). Filtrá los falsos positivos con criterio.
 - Subí `--threshold` si hay ruido; bajalo si querés casos más laxos.
+- La `similarity` de un grupo es el **piso conservador** (la mínima similitud pairwise del grupo). Como el
+  agrupado es transitivo (A~B y B~C unen a A, B y C aunque A~C sea más bajo), ese piso **puede quedar por
+  debajo del `--threshold`** que pediste. Es esperado: usalo como señal, no como garantía dura.
+- Solo detecta componentes declarados como `function` o `const X = () => …`. Los envueltos en
+  `React.memo(...)` / `forwardRef(...)` **no** se ven (limitación conocida del v1).
