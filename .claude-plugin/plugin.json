@@ -1,6 +1,6 @@
 {
   "name": "nextjs-praxis-guard",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "Avisa (sin bloquear) sobre malas praxis en Next.js: secretos, datos quemados, imports prohibidos y archivos que mezclan responsabilidades.",
   "author": {
     "name": "WSmithDR",
