@@ -1,9 +1,8 @@
 #!/bin/bash
-# post-commit: auto-bump de la versión en .claude-plugin/plugin.json según el
-# prefijo del commit (conventional commits) y amend del commit para incluir el cambio.
-#
-# Adaptado del feature `versioning` de cli-plugin-template para un plugin de un solo
-# manifiesto (sin bump-version.py, sin marketplace.json): bumpea plugin.json directo.
+# post-commit: auto-bump de la versión según el prefijo del commit (conventional commits)
+# y amend del commit para incluir el cambio. Delega en bin/bump-version.py, que sincroniza
+# TODOS los manifiestos por-CLI (.claude-plugin / .codex-plugin / .copilot-plugin / gemini),
+# no solo el de Claude (eso era el bug del drift).
 #
 #   feat:                 -> minor
 #   fix|chore|docs|...     -> patch
@@ -15,11 +14,13 @@ set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 PLUGIN_JSON="$REPO_ROOT/.claude-plugin/plugin.json"
+BUMPER="$REPO_ROOT/bin/bump-version.py"
 SENTINEL="$REPO_ROOT/.git/.version-bump-in-progress"
 
 # Guard de recursión: la invocación re-disparada por el amend sale acá.
 if [ -f "$SENTINEL" ]; then rm -f "$SENTINEL"; exit 0; fi
 [ ! -f "$PLUGIN_JSON" ] && exit 0
+[ ! -f "$BUMPER" ] && exit 0
 
 # Si plugin.json ya entró en este commit (bump manual), no tocar.
 if git show --name-only --format="" HEAD | grep -qx "\.claude-plugin/plugin\.json"; then exit 0; fi
@@ -29,29 +30,16 @@ if echo "$MSG" | grep -qiE "(BREAKING[ -]CHANGE|^.+!:)"; then BUMP="major"
 elif echo "$MSG" | grep -qiE "^feat(\(.+\))?:"; then BUMP="minor"
 else BUMP="patch"; fi
 
-# Bump quirúrgico de la línea de versión: preserva el resto del archivo byte a byte
-# (no re-serializa el JSON, así no toca tildes ni el formato). Valores por env, no
-# interpolados en el código Python (seguridad).
-OUT=$(BUMP="$BUMP" PLUGIN_JSON="$PLUGIN_JSON" python3 - <<'PY'
-import os, re, sys
-path, bump = os.environ['PLUGIN_JSON'], os.environ['BUMP']
-txt = open(path, encoding='utf-8').read()
-m = re.search(r'("version"\s*:\s*")(\d+)\.(\d+)\.(\d+)(")', txt)
-if not m: sys.exit('no se encontró "version" en ' + path)
-major, minor, patch = int(m.group(2)), int(m.group(3)), int(m.group(4))
-old = f'{major}.{minor}.{patch}'
-if bump == 'major': major, minor, patch = major + 1, 0, 0
-elif bump == 'minor': minor, patch = minor + 1, 0
-else: patch += 1
-new = f'{major}.{minor}.{patch}'
-open(path, 'w', encoding='utf-8').write(txt[:m.start()] + m.group(1) + new + m.group(5) + txt[m.end():])
-print(old + ' ' + new)
-PY
-)
-read -r OLD NEW <<< "$OUT"
+OLD=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['version'])" "$PLUGIN_JSON")
+# Delega: bumpea el canónico y propaga a TODOS los manifiestos por-CLI.
+python3 "$BUMPER" "$BUMP" >/dev/null
+NEW=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['version'])" "$PLUGIN_JSON")
 
-git add "$PLUGIN_JSON"
+# Stagiar todos los manifiestos con version que existan.
+for f in .claude-plugin/plugin.json .codex-plugin/plugin.json .copilot-plugin/plugin.json gemini-extension.json; do
+  [ -f "$REPO_ROOT/$f" ] && git -C "$REPO_ROOT" add "$f"
+done
 touch "$SENTINEL"
 git commit --amend --no-edit --no-verify
 rm -f "$SENTINEL"
-echo "  version: $OLD → $NEW ($BUMP)"
+echo "  version: $OLD → $NEW ($BUMP) [todos los manifiestos]"
