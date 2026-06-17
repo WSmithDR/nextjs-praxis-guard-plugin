@@ -67,7 +67,7 @@ Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `classN
 | Regla | Qué detecta |
 |-------|-------------|
 | `tailwind-arbitrary-values` | Valores arbitrarios `w-[473px]`, `text-[#3a3a3a]` que rompen el design system. Config: `allow`. |
-| `tailwind-classname-bloat` | `className` con más de `maxClasses` clases (default 12) → extraé a componente o `cva`. Si el proyecto usa `cva`/`tailwind-variants` (por `package.json`), el aviso lo nombra. |
+| `tailwind-classname-bloat` | `className` con más de `maxClasses` clases (default 12) → extraé a componente o `cva`. El aviso es project-aware: nombra `cva`/`tailwind-variants` si están en `package.json`, y ofrece `@apply` si el proyecto ya lo usa. |
 | `tailwind-conditional-concat` | `className={'p-4 '+(x?'a':'')}` → usá `clsx`/`cn` (se rompe con el purge). |
 | `tailwind-duplicate-utilities` | Clases duplicadas o contradictorias (`p-2 p-4`, `flex block`). |
 

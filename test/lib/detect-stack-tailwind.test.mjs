@@ -40,4 +40,12 @@ assert.equal(detectStack(tv).tailwindComponentLib, 'tailwind-variants');
 // sin lib -> null (el fixture v4 de arriba no tiene cva/tv)
 assert.equal(detectStack(v4).tailwindComponentLib, null);
 
+// tailwindUsesApply: detecta @apply en un CSS convencional
+const apply = mkdtempSync(join(tmpdir(), 'dsapply-'));
+mkdirSync(join(apply, 'app'), { recursive: true });
+writeFileSync(join(apply, 'app', 'globals.css'), '.btn { @apply px-4 py-2 rounded; }');
+assert.equal(detectStack(apply).tailwindUsesApply, true);
+// el v4 (solo @theme, sin @apply) -> false
+assert.equal(detectStack(v4).tailwindUsesApply, false);
+
 console.log('detect-stack-tailwind.test ok');

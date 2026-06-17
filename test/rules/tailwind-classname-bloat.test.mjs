@@ -21,4 +21,15 @@ assert.match(outCva[0].message, /Tu proyecto usa cva/);
 // sin lib -> mensaje genérico (no dice "Tu proyecto usa")
 assert.doesNotMatch(rule(bad, 'C.tsx', cfg, full)[0].message, /Tu proyecto usa/);
 
+// @apply: si el proyecto lo usa, el aviso lo ofrece
+const fullApply = { detected: { tailwind: true, tailwindUsesApply: true } };
+assert.match(rule(bad, 'C.tsx', cfg, fullApply)[0].message, /@apply/);
+// sin @apply -> no lo menciona
+assert.doesNotMatch(rule(bad, 'C.tsx', cfg, full)[0].message, /@apply/);
+// combinado cva + apply -> menciona ambos
+const fullBoth = { detected: { tailwind: true, tailwindComponentLib: 'cva', tailwindUsesApply: true } };
+const mBoth = rule(bad, 'C.tsx', cfg, fullBoth)[0].message;
+assert.match(mBoth, /cva/);
+assert.match(mBoth, /@apply/);
+
 console.log('tailwind-classname-bloat.test ok');
