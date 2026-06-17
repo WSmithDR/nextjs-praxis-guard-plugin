@@ -28,4 +28,16 @@ const d0 = detectStack(none);
 assert.equal(d0.tailwind, false);
 assert.equal(d0.tailwindThemeSource, null);
 
+// tailwindComponentLib desde package.json
+const cva = mkdtempSync(join(tmpdir(), 'dscva-'));
+writeFileSync(join(cva, 'package.json'), JSON.stringify({ dependencies: { 'class-variance-authority': '^0.7.0' } }));
+assert.equal(detectStack(cva).tailwindComponentLib, 'cva');
+
+const tv = mkdtempSync(join(tmpdir(), 'dstv-'));
+writeFileSync(join(tv, 'package.json'), JSON.stringify({ devDependencies: { 'tailwind-variants': '^0.2.0' } }));
+assert.equal(detectStack(tv).tailwindComponentLib, 'tailwind-variants');
+
+// sin lib -> null (el fixture v4 de arriba no tiene cva/tv)
+assert.equal(detectStack(v4).tailwindComponentLib, null);
+
 console.log('detect-stack-tailwind.test ok');

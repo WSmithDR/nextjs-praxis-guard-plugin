@@ -13,8 +13,12 @@ export default function tailwindClassnameBloat(content, filePath, config = {}, f
   for (const { value, line } of extractClassNames(content)) {
     const n = value.split(/\s+/).filter(Boolean).length;
     if (n > maxClasses) {
+      const lib = full.detected && full.detected.tailwindComponentLib;
+      const tip = lib
+        ? `Tu proyecto usa ${lib}: extraé esta lista a una variante/componente con ${lib}.`
+        : 'Extraé a un componente o usá cva/tailwind-variants.';
       out.push({ rule: 'tailwind-classname-bloat', line, severity: 'info',
-        message: `className con ${n} clases (umbral ${maxClasses}). Extraé a un componente o usá cva/tailwind-variants.` });
+        message: `className con ${n} clases (umbral ${maxClasses}). ${tip}` });
     }
   }
   return out;
