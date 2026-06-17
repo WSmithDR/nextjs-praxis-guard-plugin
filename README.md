@@ -345,6 +345,20 @@ futura). Esto implica falsos negativos **conocidos y aceptados** — no son bugs
 npm test
 ```
 
+## Generación de tests (opt-in)
+
+La skill **`praxis-gen-tests`** genera el archivo de test de arranque de un componente/archivo. El
+motor determinista detecta framework, ruta y firma; el agente escribe los casos reales sobre ese plan
+y **nunca pisa** un test existente.
+
+```bash
+# motor (devuelve el PLAN en JSON):
+node bin/gen-tests.mjs <archivo> --dir <proyecto>
+```
+
+Detecta `vitest` / `jest` / `node:test` (por `package.json`/configs), usa `@testing-library/react` si
+está, calcula la ruta (`__tests__/` o co-located `*.test.tsx`), y extrae export + props del componente.
+
 ## Desarrollo: versionado automático
 
 Un hook `post-commit` bumpea la versión de `.claude-plugin/plugin.json` en cada commit, según el
