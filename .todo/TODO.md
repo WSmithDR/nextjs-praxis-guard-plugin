@@ -12,12 +12,6 @@
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
 
-- [ ] **`@apply` en el mensaje de bloat** — complemento de "abstracción cva" (la parte cva se hace ahora):
-      además de sugerir `cva`/`tailwind-variants`, detectar si el proyecto tiene CSS con `@apply` (o capacidad
-      de usarlo) y ofrecer "extraé a una utility/clase con `@apply`" como alternativa en el aviso de
-      `tailwind-classname-bloat`. Requiere conciencia de CSS (qué archivo, escanear `@apply`), por eso se
-      separó de la parte cva (que va por `package.json`). _(creado por: SmithDR · 2026-06-16)_
-
 - [ ] **Generación automática de tests para archivos/componentes** — una capacidad (skill y/o slash
       command, ej. `/gen-tests <archivo>`) que, dado un archivo o componente, genera el archivo de test
       correspondiente (scaffolding): detecta el framework de test del proyecto (vitest/jest/node:test),
