@@ -16,6 +16,14 @@ la escritura la hace el CLI determinista `bin/praxis-config.mjs` (valida + escri
    - Salida `{}` → modo **first-run** (no hay config).
    - Salida con contenido → modo **editar** (mostrásela al usuario antes de preguntar).
 
+1.5. **Alcance de archivos (gitignore + directorios a excluir):**
+   - Preguntá: **"¿Respetar el `.gitignore`? (no audita lo que git ignora — recomendado)"**.
+     Si sí, seteá `respectGitignore: true` en el objeto config (default es `false`).
+   - Corré `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-config.mjs suggest-excludes --dir <raíz>` y leé
+     `candidates`. Presentalos como **checklist** ("¿cuáles de estos NO querés auditar?") y ofrecé
+     además **texto libre** para agregar nombres a mano (p. ej. dirs de otros plugins que el detector
+     no pescó). Mergeá lo elegido en `config.exclude` (sin pisar lo previo, sin duplicados).
+
 2. **Preguntá al usuario** (en Claude Code podés usar la UI de opciones; en otros CLIs,
    en el chat). Cubrí, una cosa a la vez:
    - **Reglas de contenido** activar/desactivar: `secrets`, `hardcoded-data`,
