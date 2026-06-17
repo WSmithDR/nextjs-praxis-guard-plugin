@@ -1,0 +1,14 @@
+{
+  "name": "nextjs-praxis-guard",
+  "owner": {
+    "name": "WSmithDR",
+    "url": "https://github.com/WSmithDR"
+  },
+  "plugins": [
+    {
+      "name": "nextjs-praxis-guard",
+      "source": "./",
+      "description": "Avisa (sin bloquear) sobre malas praxis en Next.js: secretos, datos quemados, imports prohibidos, archivos que mezclan responsabilidades, reuso de tipos TS y tokens de Tailwind. Multi-CLI."
+    }
+  ]
+}

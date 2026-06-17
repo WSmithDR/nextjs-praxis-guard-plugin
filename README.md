@@ -137,15 +137,53 @@ export default function (content, filePath, config = {}, full = {}) {
 No bloquea, no falla, **nunca rompe la edición** (siempre sale con exit 0). Si una regla
 revienta, se ignora silenciosamente y el resto sigue corriendo.
 
-## Instalación por CLI
+## Instalación
+
+Hay **dos formas de obtener el plugin**, según el CLI: por el **marketplace de Claude Code**, o
+**clonando el repo** para los demás CLIs.
+
+### Claude Code (marketplace)
+
+El repo es su propio marketplace (`.claude-plugin/marketplace.json`). En Claude Code:
+
+```
+/plugin marketplace add WSmithDR/nextjs-praxis-guard-plugin
+/plugin install nextjs-praxis-guard@nextjs-praxis-guard
+```
+
+`nextjs-praxis-guard@nextjs-praxis-guard` es `plugin@marketplace` (el repo aloja un único plugin con
+el mismo nombre). **Reiniciá la sesión** tras instalar: el plugin trae bundled `hooks/hooks.json`
+(`PostToolUse`), así que los hooks se cargan solos. Para quitarlo: `/plugin uninstall nextjs-praxis-guard`.
+
+> El marketplace clona la rama por default del repo. Para fijar una versión, podés agregar el
+> marketplace desde un fork/tag, o instalar desde un checkout local con `/plugin marketplace add <ruta>`.
+
+### Otros CLIs (clonar el repo)
+
+Codex, Copilot, OpenCode y el git pre-commit **no** usan el marketplace de Claude Code: cloná el repo
+una vez y corré el instalador apuntando a tu proyecto.
+
+```bash
+git clone https://github.com/WSmithDR/nextjs-praxis-guard-plugin.git
+cd nextjs-praxis-guard-plugin
+npm install   # deps del plugin (incluye su typescript para las reglas AST)
+node bin/install-hooks.mjs --target <ruta-a-tu-proyecto> --cli <codex|copilot|opencode|precommit|github-action>
+```
+
+Gemini CLI usa su propio formato de extensión (`gemini-extension.json`, bundled): se instala como
+extensión de Gemini, no por este script. Ver abajo.
+
+## Hooks por CLI
+
+Una vez obtenido el plugin (arriba), así se **activa el hook** en cada CLI:
 
 ### Claude Code
-Automático. El plugin trae bundled `hooks/hooks.json` (hook `PostToolUse`). **Reiniciá la
-sesión** para que Claude Code cargue los hooks.
+Automático tras `/plugin install`. El hook `PostToolUse` viene en `hooks/hooks.json`. **Reiniciá la
+sesión** para que Claude Code lo cargue.
 
 ### Gemini CLI
-Automático. El plugin trae bundled la extensión `gemini-extension.json` (hook `AfterTool`) más
-los hooks.
+Automático al instalar la extensión. El plugin trae bundled `gemini-extension.json` (hook `AfterTool`)
+más los hooks.
 
 > **Caveat Gemini:** Gemini CLI migra a **Antigravity CLI el 2026-06-18**. Tras la transición,
 > re-verificá el schema de hooks: el formato del manifest puede cambiar.
