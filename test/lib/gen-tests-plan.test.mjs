@@ -42,4 +42,31 @@ const pc = buildTestPlan(ts, c, join(c, 'y.ts'));
 assert.equal(pc.framework, 'node:test');
 assert.equal(pc.exists, true);
 
+// export default Foo (identificador a una función definida arriba) -> resuelve props/React
+const d = mkdtempSync(join(tmpdir(), 'gt-d-'));
+writeFileSync(join(d, 'package.json'), JSON.stringify({ devDependencies: { vitest: '^1' } }));
+const card = join(d, 'Card.tsx');
+writeFileSync(card, `function Card(props: { title: string }) { return <div>{props.title}</div>; }\nexport default Card;`);
+const pd = buildTestPlan(ts, d, card);
+assert.equal(pd.component.name, 'Card');
+assert.equal(pd.component.exportKind, 'default');
+assert.equal(pd.component.isReactComponent, true, 'export default Foo resuelto');
+assert.ok(pd.component.props.map((p) => p.name).includes('title'), 'props del Foo resuelto');
+
+// named export component
+const e = mkdtempSync(join(tmpdir(), 'gt-e-'));
+writeFileSync(join(e, 'package.json'), JSON.stringify({}));
+const named = join(e, 'Nav.tsx');
+writeFileSync(named, 'export function Nav(props: { items: string[] }) { return null; }');
+const pe = buildTestPlan(ts, e, named);
+assert.equal(pe.component.name, 'Nav');
+assert.equal(pe.component.exportKind, 'named');
+
+// sin export parseable -> component null
+const f = mkdtempSync(join(tmpdir(), 'gt-f-'));
+writeFileSync(join(f, 'package.json'), JSON.stringify({}));
+const noexp = join(f, 'z.ts');
+writeFileSync(noexp, 'const x = 5; console.log(x);');
+assert.equal(buildTestPlan(ts, f, noexp).component, null);
+
 console.log('gen-tests-plan.test ok');
