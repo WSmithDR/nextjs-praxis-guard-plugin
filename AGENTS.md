@@ -74,6 +74,10 @@ reglas correr y con qué parámetros, y la escribe por vos (vía `bin/praxis-con
 En Claude Code, si un proyecto Next.js no tiene config, el hook SessionStart te lo ofrece
 una vez. En las otras CLIs, corré `praxis-config` a demanda.
 
+El alcance de archivos se recorta con `exclude` (por nombre de directorio) y `respectGitignore`
+(default `false`; si se activa, hook y auditor saltean lo que git ignora, vía `git check-ignore`,
+fail-open). `praxis-config` pregunta por ambos (incluido un checklist de directorios candidatos).
+
 ## Generación de tests
 
 La skill **`praxis-gen-tests`** genera el archivo de test **de arranque** de un componente/archivo:

@@ -413,6 +413,11 @@ Para activar reglas de arquitectura, declarás la estrategia y configurás cada 
 }
 ```
 
+**Qué archivos se auditan.** Dos filtros recortan el universo: `exclude` (por **nombre de directorio**:
+código tuyo que no querés auditar, p. ej. dirs de otros plugins) y `respectGitignore` (los archivos que
+**git ignora**: build, deps, secretos). La skill `praxis-config` te pregunta por ambos — ofrece activar
+el respeto al `.gitignore` y un checklist de directorios candidatos a excluir (más texto libre).
+
 ### Referencia de valores
 
 Cada regla acepta `"enabled": true|false`. Las que tienen parámetros:
@@ -447,6 +452,7 @@ Knobs **globales** (fuera de `rules`):
 |-------|---------|---------|
 | `include` | array de extensiones que el linter mira | `[".ts",".tsx",".js",".jsx",".mjs",".cjs"]` |
 | `exclude` | array de carpetas a saltear | `["node_modules/",".next/","dist/","build/",".git/","coverage/"]` |
+| `respectGitignore` | `true\|false` — no audita los archivos que git ignora (hook + auditor; fail-open si no es repo git) | `false` |
 | `architecture.strategy` | `null` · `"by-feature"` · `"by-layer"` (gate de las reglas de arquitectura) | `null` |
 | `architecture.root` / `featuresDir` / `sharedDirs` | rutas del proyecto | `"src"` / `"src/features"` / `["src/shared","src/lib"]` |
 | `commit.block` | `true\|false` (si el pre-commit aborta) | `false` |
