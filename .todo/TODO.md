@@ -12,13 +12,6 @@
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
 
-- [ ] **Generación automática de tests para archivos/componentes** — una capacidad (skill y/o slash
-      command, ej. `/gen-tests <archivo>`) que, dado un archivo o componente, genera el archivo de test
-      correspondiente (scaffolding): detecta el framework de test del proyecto (vitest/jest/node:test),
-      la convención de ubicación/nombre (`__tests__/`, `*.test.tsx` al lado, etc.), e infiere casos base
-      (render, props, ramas). A definir en su propia divergencia: alcance (solo scaffold vs casos reales),
-      cómo se invoca, y si reusa el análisis AST que ya tenemos. _(creado por: SmithDR · 2026-06-16)_
-
 - [ ] **Auditar componentes similares → unificar en compartidos** — un auditor (project rule / regla AST en
       `--deep`, o un hook on-demand) que detecte **componentes React parecidos o duplicados** entre archivos
       (misma estructura JSX / props / lógica) que convendría **unificar en un componente compartido** y reutilizar.

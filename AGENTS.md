@@ -73,3 +73,11 @@ armarla o cambiarla de forma guiada, invocá la skill **`praxis-config`**: te pr
 reglas correr y con qué parámetros, y la escribe por vos (vía `bin/praxis-config.mjs`).
 En Claude Code, si un proyecto Next.js no tiene config, el hook SessionStart te lo ofrece
 una vez. En las otras CLIs, corré `praxis-config` a demanda.
+
+## Generación de tests
+
+La skill **`praxis-gen-tests`** genera el archivo de test **de arranque** de un componente/archivo:
+un motor determinista (`bin/gen-tests.mjs`) detecta el framework (vitest/jest/node:test), la ruta del
+test (convención del proyecto) y la firma (export, props, si es componente React) — emite un PLAN JSON —
+y el agente escribe los casos reales sobre ese plan. **Nunca pisa** un test existente. Invocala con
+"generá tests para `<archivo>`".
