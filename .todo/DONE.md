@@ -1,6 +1,8 @@
 # Completados — nextjs-praxis-guard-plugin
 
-_Última actualización: 2026-06-16_
+_Última actualización: 2026-06-17_
+
+- [x] **Auditar componentes similares → unificar en compartidos** — un auditor que detecte componentes React parecidos/duplicados entre archivos para unificar en un componente compartido (equivalente "a nivel componente" de `type-duplicate-shape`). _(creado por: SmithDR · 2026-06-16)_ ✓ _resuelto: on-demand (motor `bin/similar-components.mjs` + skill `praxis-similar-components`, fuera de `--deep`). `lib/component-fingerprint.mjs` arma la firma estructural de cada componente (multiset de tipos de elemento JSX + hooks) con `ts.createSourceFile` (parser-only); `lib/similar-components.mjs` compara entre archivos distintos por Jaccard ponderado (0.8 elementos + 0.2 hooks) y agrupa con union-find (similitud del grupo = mínima pairwise). El CLI enumera `.tsx`/`.jsx` in-scope y emite `{groups}` JSON; la skill presenta los grupos y SUGIERE unificar (no refactoriza). Params `--threshold 0.85` / `--min-elements 3`. 81/81 tests. Rama feat/similar-components — responsable: SmithDR · 2026-06-17_
 
 ## MVP (Q1–Q3 originales)
 

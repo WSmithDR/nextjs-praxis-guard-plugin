@@ -11,14 +11,7 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-
-- [ ] **Auditar componentes similares → unificar en compartidos** — un auditor (project rule / regla AST en
-      `--deep`, o un hook on-demand) que detecte **componentes React parecidos o duplicados** entre archivos
-      (misma estructura JSX / props / lógica) que convendría **unificar en un componente compartido** y reutilizar.
-      Señala los candidatos y sugiere extraerlos a `shared/`/`components/`. Es el equivalente "a nivel componente"
-      de `type-duplicate-shape` (que ya hace eso para tipos). A definir en su divergencia: cómo medir "similar"
-      (fingerprint de la estructura JSX/AST, umbral de similitud), ruido vs señal, y dónde proponer el shared.
-      Engancha con la infra AST de Fase 2 (`buildTsContext`). _(creado por: SmithDR · 2026-06-16)_
+_(sin pendientes — todas las features elegidas en la divergencia están en `.todo/DONE.md`)_
 
 ## Q4 — Backlog / futuro (NO en v1)
 

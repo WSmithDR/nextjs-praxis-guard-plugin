@@ -81,3 +81,9 @@ un motor determinista (`bin/gen-tests.mjs`) detecta el framework (vitest/jest/no
 test (convención del proyecto) y la firma (export, props, si es componente React) — emite un PLAN JSON —
 y el agente escribe los casos reales sobre ese plan. **Nunca pisa** un test existente. Invocala con
 "generá tests para `<archivo>`".
+
+## Componentes para unificar
+
+La skill **`praxis-similar-components`** detecta componentes React parecidos entre archivos (firma
+estructural del JSX + hooks, similitud Jaccard sobre un umbral) y sugiere unificarlos en un componente
+compartido. On-demand (motor `bin/similar-components.mjs`); solo señala, no refactoriza.

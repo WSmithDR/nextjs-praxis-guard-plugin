@@ -359,6 +359,21 @@ node bin/gen-tests.mjs <archivo> --dir <proyecto>
 Detecta `vitest` / `jest` / `node:test` (por `package.json`/configs), usa `@testing-library/react` si
 está, calcula la ruta (`__tests__/` o co-located `*.test.tsx`), y extrae export + props del componente.
 
+## Componentes para unificar (opt-in)
+
+La skill **`praxis-similar-components`** detecta componentes React parecidos/duplicados entre archivos
+(candidatos a unificar en uno compartido) y **sugiere** la unificación — no refactoriza. Es el
+equivalente "a nivel componente" de `type-duplicate-shape`.
+
+```bash
+# motor (devuelve los grupos en JSON):
+node bin/similar-components.mjs --dir <proyecto> [--threshold 0.85] [--min-elements 3]
+```
+
+Arma una firma estructural de cada componente (multiset de tipos de elemento JSX + hooks), compara por
+similitud Jaccard ponderada entre archivos distintos y agrupa los que pasan el umbral (union-find).
+Subí `--threshold` si hay ruido; bajalo para casos más laxos.
+
 ## Desarrollo: versionado automático
 
 Un hook `post-commit` bumpea la versión de `.claude-plugin/plugin.json` en cada commit, según el
