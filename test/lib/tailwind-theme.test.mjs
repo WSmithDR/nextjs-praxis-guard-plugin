@@ -43,4 +43,18 @@ const t4 = parseTailwindTheme(ts, cfg4);
 assert.equal(t4.colors.get('#123456'), 'ok', 'sobrevive el literal');
 assert.equal(t4.colors.size, 1, 'spread/función se saltearon');
 
+// v4: theme en CSS (@theme). `ts` se pasa pero el branch CSS no lo usa.
+const cssPath = join(dir, 'globals.css');
+writeFileSync(cssPath, `@import "tailwindcss";
+@theme {
+  --color-brand: #1A1A1A;
+  --color-accent-500: #abcdef;
+  --spacing-sm: 0.5rem
+}`);
+const tcss = parseTailwindTheme(ts, cssPath);
+assert.ok(tcss, 'esperaba theme del CSS');
+assert.equal(tcss.colors.get('#1a1a1a'), 'brand', 'hex normalizado, token v4 = brand');
+assert.equal(tcss.colors.get('#abcdef'), 'accent-500');
+assert.equal(tcss.spacing.get('0.5rem'), 'sm', 'última decl sin ; igual se parsea');
+
 console.log('tailwind-theme.test ok');

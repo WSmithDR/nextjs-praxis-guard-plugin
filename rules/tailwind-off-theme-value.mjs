@@ -11,8 +11,8 @@ export default function tailwindOffThemeValue(ctx, full = {}) {
   if (cfg.enabled === false) return [];
   if (!ctx || !ctx.ts) return [];
   const det = full.detected || {};
-  if (!det.tailwind || !det.tailwindConfigPath) return [];
-  const theme = parseTailwindTheme(ctx.ts, det.tailwindConfigPath);
+  if (!det.tailwind || !det.tailwindThemeSource) return [];
+  const theme = parseTailwindTheme(ctx.ts, det.tailwindThemeSource);
   if (!theme) return [];
 
   const out = [];

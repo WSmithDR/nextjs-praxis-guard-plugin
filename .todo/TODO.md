@@ -11,10 +11,6 @@
 
 ## ⭐ Pendientes reales (próximas features — elegidas en la divergencia)
 
-- [ ] **Tailwind v4 CSS-only (@theme) — detección + parseo** — el sub-proyecto B cubre config-file (v3 y
-      v4 con archivo); un proyecto v4 CSS-puro (`@theme` en CSS, sin `tailwind.config.*`) hoy ni se detecta
-      (`detect-stack` solo mira archivos de config). Extender la detección a escanear CSS (`@import "tailwindcss"`
-      / `@theme`) y que `tailwind-theme.mjs` lea los `--color-*`/`--spacing-*` del CSS. _(creado por: SmithDR · 2026-06-16)_
 
 - [ ] **Premiar abstracción de componentes Tailwind (@apply/cva)** — refinar el mensaje de
       `tailwind-classname-bloat` (que ya detecta `className` con demasiadas clases): si el proyecto usa

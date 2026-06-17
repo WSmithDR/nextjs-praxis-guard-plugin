@@ -75,7 +75,8 @@ Corren solo si hay `tailwind.config.*`. Operan sobre el contenido de los `classN
 
 Parsean el `tailwind.config.*` **estáticamente** (sin ejecutarlo) y validan contra los tokens
 **declarados por el proyecto** (`theme`/`theme.extend`; no los defaults built-in de Tailwind).
-Cubren v3 / config con archivo; v4 CSS-only (`@theme`) es follow-up.
+Cubren **v3** (config file) y **v4 CSS-only** (theme en `@theme` del CSS; Tailwind se detecta por
+`tailwindcss` en `package.json` y el `@theme` se busca en los CSS convencionales como `app/globals.css`).
 
 | Regla | Qué detecta | Default |
 |-------|-------------|---------|

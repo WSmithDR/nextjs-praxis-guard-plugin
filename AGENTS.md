@@ -17,7 +17,7 @@ Más reglas AST de "código idiomático" (también `--deep`): `prefer-satisfies`
 por default). Más `magic-literal-repeated` (project rule, literal repetido en N archivos). Reglas Tailwind (autodetect si hay `tailwind.config.*`):
 `tailwind-arbitrary-values`, `tailwind-classname-bloat`, `tailwind-conditional-concat`,
 `tailwind-duplicate-utilities`. Reglas Tailwind **theme-aware** (AST, `--deep`; parsean el
-`tailwind.config` estáticamente, solo tokens del proyecto): `tailwind-arbitrary-has-token`
+`tailwind.config` estáticamente —o el `@theme` del CSS en v4—, solo tokens del proyecto): `tailwind-arbitrary-has-token`
 (sugiere el token cuando un valor arbitrario lo matchea) y `tailwind-off-theme-value`
 (experimental, off). Config por proyecto en `nextjs-praxis-guard.json` (raíz,
 CLI-agnóstica), con `.claude/nextjs-praxis-guard.json` como fallback.
