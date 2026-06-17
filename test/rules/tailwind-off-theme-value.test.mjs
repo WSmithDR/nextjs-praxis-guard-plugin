@@ -7,7 +7,7 @@ import { buildContextFor } from '../helpers/ast.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
 const cfgPath = join(here, '..', 'fixtures', 'ast', 'tw-off-theme', 'tailwind.config.js');
 const ctx = await buildContextFor('tw-off-theme');
-const full = { detected: { tailwind: true, tailwindConfigPath: cfgPath },
+const full = { detected: { tailwind: true, tailwindThemeSource: cfgPath },
                rules: { 'tailwind-off-theme-value': { enabled: true } } };
 
 const out = rule(ctx, full);
