@@ -6,14 +6,16 @@ import { isInScope } from '../lib/scope.mjs';
 import { formatFindings } from '../lib/findings.mjs';
 import { detectStack } from '../lib/detect-stack.mjs';
 import { loadCustomRules } from '../lib/custom-rules.mjs';
+import { isGitIgnored } from '../lib/gitignore.mjs';
 
-// runDetector(filePath, { content?, config? }) -> { findings, text }
-export function runDetector(filePath, { content, config, customFileRules } = {}) {
+// runDetector(filePath, { content?, config?, cwd? }) -> { findings, text }
+export function runDetector(filePath, { content, config, customFileRules, cwd = process.cwd() } = {}) {
   const cfg = config || loadConfig({ projectConfigPath: defaultProjectConfigPath() });
   if (!cfg.detected) {
-    try { cfg.detected = detectStack(process.cwd()); } catch { cfg.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
+    try { cfg.detected = detectStack(cwd); } catch { cfg.detected = { typescript: false, tailwind: false, tsconfigOptions: null, tsconfigFixable: false }; }
   }
   if (!isInScope(filePath, cfg)) return { findings: [], text: '' };
+  if (cfg.respectGitignore && isGitIgnored(cwd, filePath)) return { findings: [], text: '' };
 
   let src = content;
   if (src == null) {
