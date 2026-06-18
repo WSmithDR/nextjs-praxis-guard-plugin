@@ -47,6 +47,10 @@ assert.equal(validateConfig({ rules: { 'thin-route-pages': { enabled: true, maxL
 assert.ok(validateConfig({ rules: { 'thin-route-pages': { maxStructuralTags: 'x' } } }).errors.some((e) => /maxStructuralTags/.test(e)), 'maxStructuralTags numérico');
 assert.equal(validateConfig({ rules: { 'tailwind-content-coverage': { enabled: false } } }).ok, true);
 
+// descriptive-component-names
+assert.equal(validateConfig({ rules: { 'descriptive-component-names': { blocklist: ['Card'], allow: ['Box'] } } }).ok, true);
+assert.ok(validateConfig({ rules: { 'descriptive-component-names': { blocklist: 'Card' } } }).errors.some((e) => /blocklist/.test(e)), 'blocklist array');
+
 assert.equal(validateConfig(null).ok, false);
 assert.equal(validateConfig([]).ok, false);
 
