@@ -6,6 +6,8 @@ import fileResponsibility from './file-responsibility.mjs';
 import untranslatedText from './untranslated-text.mjs';
 import singleComponentPerFile from './single-component-per-file.mjs';
 import inlineMappedComponent from './inline-mapped-component.mjs';
+import thinRoutePages from './thin-route-pages.mjs';
+import tailwindContentCoverage from './tailwind-content-coverage.mjs';
 import folderPlacement from './folder-placement.mjs';
 import layerBoundaries from './layer-boundaries.mjs';
 import serverClientBoundaries from './server-client-boundaries.mjs';
@@ -41,6 +43,7 @@ export const RULES = {
   'untranslated-text': untranslatedText,
   'single-component-per-file': singleComponentPerFile,
   'inline-mapped-component': inlineMappedComponent,
+  'thin-route-pages': thinRoutePages,
   'folder-placement': folderPlacement,
   'layer-boundaries': layerBoundaries,
   'server-client-boundaries': serverClientBoundaries,
@@ -61,6 +64,7 @@ export const PROJECT_RULES = {
   'architecture-coherence': architectureCoherence,
   'tsconfig-strictness': tsconfigStrictness,
   'magic-literal-repeated': magicLiteralRepeated,
+  'tailwind-content-coverage': tailwindContentCoverage,
 };
 
 // AST rules: (astContext, fullConfig) => Finding[]
