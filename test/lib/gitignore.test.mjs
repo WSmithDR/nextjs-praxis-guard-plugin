@@ -28,4 +28,8 @@ assert.equal(isGitIgnored(plain, 'a.ts'), false);
 // lista vacía no rompe
 assert.deepEqual(filterGitIgnored(repo, []), []);
 
+// dir inexistente -> fail-open, nunca lanza
+assert.deepEqual(filterGitIgnored('/no/such/dir/xyz', ['a.ts', 'b.ts']), ['a.ts', 'b.ts']);
+assert.equal(isGitIgnored('/no/such/dir/xyz', 'a.ts'), false);
+
 console.log('gitignore.test ok');
