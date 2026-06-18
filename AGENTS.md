@@ -7,8 +7,9 @@ linter determinístico revisa el archivo y, si encuentra problemas, te inyecta u
 (un componente por archivo) e `inline-mapped-component` (sugiere extraer un componente cuando un
 `.map()` renderiza JSX no trivial inline). Reglas de arquitectura
 (opt-in, requieren declarar `architecture.strategy`): `folder-placement`, `layer-boundaries`,
-`server-client-boundaries`, `feature-deps` (por-archivo) y `architecture-coherence` (solo
-auditoría). Reglas TypeScript (autodetect si hay `tsconfig.json`; aprovechamiento de tipos, no
+`server-client-boundaries`, `feature-deps`, `thin-route-pages` (page.tsx fina: solo monta el
+componente de la feature) (por-archivo); `architecture-coherence` y `tailwind-content-coverage`
+(el `content` de tailwind.config cubre featuresDir/sharedDirs) (solo auditoría). Reglas TypeScript (autodetect si hay `tsconfig.json`; aprovechamiento de tipos, no
 duplican ESLint): `repeated-object-shape`, `stringly-typed`, `duplicate-literal-union`,
 `prefer-as-const` (por-archivo) y `tsconfig-strictness` (auditoría, con fixer
 `praxis-audit --fix-tsconfig`). Reglas TypeScript con AST (Fase 2, **modo profundo** `--deep`;

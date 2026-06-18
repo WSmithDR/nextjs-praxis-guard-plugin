@@ -29,7 +29,9 @@ layout no estándar.
 | `layer-boundaries` | por-archivo | Imports que violan la dirección permitida entre capas (ej: `domain` no puede importar de `infra`/`ui`). |
 | `server-client-boundaries` | por-archivo | Un client component (`'use client'`) que importa módulos server-only (`next/headers`, `node:*`, …). |
 | `feature-deps` | por-archivo | Una feature que importa los **internos** de otra en vez de su API pública. |
+| `thin-route-pages` | por-archivo | Un `app/**/page.tsx` con lógica de negocio (estado/hooks, muchas líneas, o JSX estructural) en vez de montar el componente público de la feature. Respeta route groups. Configurable: `maxLines`, `maxStructuralTags`. |
 | `architecture-coherence` | proyecto | Incoherencia global con la estrategia (ej: `by-feature` pero hay un `src/components/` global). Solo corre en la auditoría. |
+| `tailwind-content-coverage` | proyecto | El `content` de `tailwind.config` no cubre `featuresDir`/`sharedDirs`: al mover componentes ahí, Tailwind purga sus clases en silencio (build verde, página sin estilos). Sugiere el glob faltante. Solo corre en la auditoría. |
 
 ## Reglas TypeScript (autodetect)
 
@@ -451,6 +453,7 @@ Cada regla acepta `"enabled": true|false`. Las que tienen parámetros:
 | | `ignore` | array de strings/regex a ignorar | `[]` |
 | `single-component-per-file` | `ignore` | array de globs exentos (co-location legítima) | `["**/*.stories.tsx","**/*.stories.jsx","**/*.test.tsx","**/*.test.jsx","**/*.spec.tsx","**/*.spec.jsx"]` |
 | `inline-mapped-component` | `minTags` | entero (tags JSX mínimos en el `.map` para sugerir extraer) | `3` |
+| `thin-route-pages` | `maxLines` / `maxStructuralTags` | enteros (umbral de líneas / tags HTML antes de avisar) | `30` / `2` |
 | `folder-placement` | `placement` | array de `{ "kind", "match" (regex), "allowed" (globs) }` | `[]` |
 | `layer-boundaries` | `layers` | array de `{ "name", "path", "mayImport": string[] }` | `[]` |
 | `server-client-boundaries` | `serverOnly` | array de módulos server-only | `["server-only","next/headers","fs","node:fs",…]` |

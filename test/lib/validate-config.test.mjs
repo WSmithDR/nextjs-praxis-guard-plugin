@@ -42,6 +42,11 @@ assert.ok(validateConfig({ rules: { 'single-component-per-file': { ignore: 'x' }
 assert.equal(validateConfig({ rules: { 'inline-mapped-component': { enabled: true, minTags: 4 } } }).ok, true);
 assert.ok(validateConfig({ rules: { 'inline-mapped-component': { minTags: 'x' } } }).errors.some((e) => /minTags/.test(e)), 'minTags debe ser número');
 
+// thin-route-pages + tailwind-content-coverage
+assert.equal(validateConfig({ rules: { 'thin-route-pages': { enabled: true, maxLines: 30, maxStructuralTags: 2 } } }).ok, true);
+assert.ok(validateConfig({ rules: { 'thin-route-pages': { maxStructuralTags: 'x' } } }).errors.some((e) => /maxStructuralTags/.test(e)), 'maxStructuralTags numérico');
+assert.equal(validateConfig({ rules: { 'tailwind-content-coverage': { enabled: false } } }).ok, true);
+
 assert.equal(validateConfig(null).ok, false);
 assert.equal(validateConfig([]).ok, false);
 
