@@ -37,6 +37,8 @@ assert.ok(r.errors.some((e) => /maxLines/.test(e)), 'override.maxLines debe ser 
 
 // reglas de componentes
 assert.equal(validateConfig({ rules: { 'single-component-per-file': { enabled: true } } }).ok, true);
+assert.equal(validateConfig({ rules: { 'single-component-per-file': { ignore: ['**/*.stories.tsx'] } } }).ok, true);
+assert.ok(validateConfig({ rules: { 'single-component-per-file': { ignore: 'x' } } }).errors.some((e) => /ignore/.test(e)), 'ignore debe ser array');
 assert.equal(validateConfig({ rules: { 'inline-mapped-component': { enabled: true, minTags: 4 } } }).ok, true);
 assert.ok(validateConfig({ rules: { 'inline-mapped-component': { minTags: 'x' } } }).errors.some((e) => /minTags/.test(e)), 'minTags debe ser número');
 

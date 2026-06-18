@@ -34,6 +34,11 @@ assert.equal(rule(nested, 'List.tsx', cfg).length, 0, 'anidado no cuenta');
 
 // archivo no .tsx/.jsx -> 0
 assert.equal(rule(two, 'Card.ts', cfg).length, 0, 'solo tsx/jsx');
+// co-location legítima: stories/tests exentos por glob
+const igCfg = { enabled: true, ignore: ['**/*.stories.tsx', '**/*.test.tsx'] };
+assert.equal(rule(two, 'src/ui/Card.stories.tsx', igCfg).length, 0, 'stories exento');
+assert.equal(rule(two, 'src/ui/Card.test.tsx', igCfg).length, 0, 'test exento');
+assert.equal(rule(two, 'src/ui/Card.tsx', igCfg).length, 1, 'componente normal sí marca');
 // dos funciones PascalCase sin JSX -> 0 (no son componentes)
 assert.equal(rule('function Foo(){return 1}\nfunction Bar(){return 2}', 'a.tsx', cfg).length, 0, 'sin JSX no marca');
 // disabled

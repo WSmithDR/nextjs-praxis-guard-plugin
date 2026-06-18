@@ -15,7 +15,7 @@
     "forbidden-imports": { "enabled": true, "list": [] },
     "file-responsibility": { "enabled": true, "maxLines": 400, "mixedSignalsLines": 200 },
     "untranslated-text": { "enabled": true, "attributes": ["placeholder", "title", "alt", "aria-label", "label"], "ignore": [] },
-    "single-component-per-file": { "enabled": true },
+    "single-component-per-file": { "enabled": true, "ignore": ["**/*.stories.tsx", "**/*.stories.jsx", "**/*.test.tsx", "**/*.test.jsx", "**/*.spec.tsx", "**/*.spec.jsx"] },
     "inline-mapped-component": { "enabled": true, "minTags": 3 },
     "folder-placement": { "enabled": false, "placement": [] },
     "architecture-coherence": { "enabled": false },

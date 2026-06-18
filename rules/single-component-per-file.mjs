@@ -6,6 +6,10 @@
 // funciones o arrows, en un archivo .tsx/.jsx con JSX. Subcomponentes anidados (indentados)
 // NO cuentan acá — son otro patrón. forwardRef/HOC y arrows genéricos `<T,>(...)` pueden
 // pasar de largo (conservador: preferimos no marcar de más).
+//
+// `ignore` (globs): archivos que legítimamente co-locan varios componentes (stories, tests).
+import { matchGlob } from '../lib/glob.mjs';
+
 const JSX = /<[A-Za-z][\w.]*[\s/>]|<>/;
 // función top-level:  (export)(default)(async) function Foo(  |  con genéricos Foo<
 const FN_DECL = /^(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s+([A-Z]\w*)\s*[(<]/gm;
@@ -14,7 +18,9 @@ const ARROW_DECL = /^(?:export\s+)?(?:default\s+)?const\s+([A-Z]\w*)\s*(?::[^=\n
 
 export default function singleComponentPerFile(content, filePath = '', config = {}) {
   if (config.enabled === false) return [];
-  if (!/\.(tsx|jsx)$/.test(String(filePath))) return [];
+  const path = String(filePath).replace(/\\/g, '/');
+  if (!/\.(tsx|jsx)$/.test(path)) return [];
+  if ((config.ignore || []).some((g) => matchGlob(path, g))) return [];   // stories, tests, etc.
   if (!JSX.test(content)) return [];
 
   const names = new Set();

@@ -14,7 +14,7 @@ en el contexto del agente para que corrija en el flujo. Nunca rompe la edición.
 | `forbidden-imports` | Imports de módulos vetados por el proyecto. La lista es **por-proyecto y está vacía por defecto**: vos definís qué no querés ver. |
 | `file-responsibility` | Archivos demasiado largos (umbral de líneas) y un *nudge* de auto-reflexión cuando un mismo archivo mezcla *data fetching* con JSX (mezcla de responsabilidades). |
 | `untranslated-text` | Texto literal **visible** en componentes `.tsx`/`.jsx` sin interpolar — nodos JSX (`<button>Enviar</button>`) y atributos de UI (`placeholder`, `title`, `alt`, `aria-label`, `label` como `attr="texto"`). Entorpece la i18n / soporte multidioma: el texto debería pasar por una función como `{t('clave')}`. Ignora lo interpolado (`{t(...)}`, `{variable}`, `attr={...}`). Configurable: `attributes`, `ignore`. Si tu proyecto no hace i18n, desactivala con `"enabled": false`. |
-| `single-component-per-file` | Más de un componente React declarado a nivel de módulo en un mismo archivo `.tsx`/`.jsx`. Convención: un componente por archivo (más fácil de testear, importar y reusar). Cuenta solo declaraciones top-level; subcomponentes anidados no cuentan. |
+| `single-component-per-file` | Más de un componente React declarado a nivel de módulo en un mismo archivo `.tsx`/`.jsx`. Convención: un componente por archivo (más fácil de testear, importar y reusar). Cuenta solo declaraciones top-level; subcomponentes anidados no cuentan. `ignore` (globs) exime archivos que co-locan varios a propósito (por default stories y tests). |
 | `inline-mapped-component` | Un `.map()` que renderiza un bloque JSX no trivial inline (≥ `minTags` elementos, default `3`). Sugiere extraer un componente (`<Item/>`) y mapearlo. Mezclar iteración + markup grande inline cuesta testear y reusar. |
 
 ## Reglas de arquitectura (opt-in)
@@ -449,6 +449,7 @@ Cada regla acepta `"enabled": true|false`. Las que tienen parámetros:
 | | `overrides` | array de `{ "glob", "maxLines"?, "mixedSignalsLines"? }` (umbral por glob; último match gana) | `[]` |
 | `untranslated-text` | `attributes` | array de nombres de atributo a vigilar | `["placeholder","title","alt","aria-label","label"]` |
 | | `ignore` | array de strings/regex a ignorar | `[]` |
+| `single-component-per-file` | `ignore` | array de globs exentos (co-location legítima) | `["**/*.stories.tsx","**/*.stories.jsx","**/*.test.tsx","**/*.test.jsx","**/*.spec.tsx","**/*.spec.jsx"]` |
 | `inline-mapped-component` | `minTags` | entero (tags JSX mínimos en el `.map` para sugerir extraer) | `3` |
 | `folder-placement` | `placement` | array de `{ "kind", "match" (regex), "allowed" (globs) }` | `[]` |
 | `layer-boundaries` | `layers` | array de `{ "name", "path", "mayImport": string[] }` | `[]` |
