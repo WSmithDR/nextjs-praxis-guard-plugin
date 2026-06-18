@@ -374,7 +374,8 @@ Ejemplo `nextjs-praxis-guard.json`:
     "forbidden-imports": {
       "list": [
         { "module": "lodash", "message": "Usá utilidades nativas o helpers de /lib en vez de lodash." },
-        { "module": "moment", "message": "moment está deprecado: usá date-fns o Intl.DateTimeFormat." }
+        { "module": "moment", "message": "moment está deprecado: usá date-fns o Intl.DateTimeFormat." },
+        { "module": "framer-motion", "allowDirs": ["lib/motion"], "message": "Importá framer-motion solo desde tu wrapper en lib/motion." }
       ]
     }
   }
@@ -382,7 +383,17 @@ Ejemplo `nextjs-praxis-guard.json`:
 ```
 
 Eso baja el umbral de `file-responsibility` a 300 líneas, deshabilita `hardcoded-data` y veta
-dos módulos en `forbidden-imports`.
+dos módulos en `forbidden-imports`. El tercero usa `allowDirs`: `framer-motion` solo se permite
+desde `lib/motion` (boundary by-feature) — importarlo desde otra carpeta se marca.
+
+Para tolerar tamaños distintos por carpeta, `file-responsibility` acepta `overrides` (umbral por glob):
+
+```json
+{ "rules": { "file-responsibility": { "maxLines": 200, "overrides": [
+  { "glob": "**/lib/**", "maxLines": 80 },
+  { "glob": "app/**/route.ts", "maxLines": 120 }
+] } } }
+```
 
 Para activar reglas de arquitectura, declarás la estrategia y configurás cada regla:
 
@@ -413,6 +424,11 @@ Para activar reglas de arquitectura, declarás la estrategia y configurás cada 
 }
 ```
 
+`folder-placement` entiende el App Router de Next: `app/**` matchea route groups `(group)`,
+parallel routes `@slot`, y dynamic `[slug]`/`[...all]`. Como los route groups son transparentes
+a la URL, un `allowed` canónico como `app/about/**` también acepta `app/(marketing)/about/page.tsx`
+(el segmento `(marketing)` se colapsa antes de matchear).
+
 **Qué archivos se auditan.** Dos filtros recortan el universo: `exclude` (por **nombre de directorio**:
 código tuyo que no querés auditar, p. ej. dirs de otros plugins) y `respectGitignore` (los archivos que
 **git ignora**: build, deps, secretos). La skill `praxis-config` te pregunta por ambos — ofrece activar
@@ -425,9 +441,10 @@ Cada regla acepta `"enabled": true|false`. Las que tienen parámetros:
 | Regla | Parámetro | Tipo / valores | Default |
 |-------|-----------|----------------|---------|
 | `hardcoded-data` | `minElements` | entero (tamaño mínimo del array para avisar) | `8` |
-| `forbidden-imports` | `list` | array de `{ "module": string, "message": string }` | `[]` |
+| `forbidden-imports` | `list` | array de `{ "module": string, "message"?: string, "allowDirs"?: string[] }` | `[]` |
 | `file-responsibility` | `maxLines` | entero (líneas para "archivo muy largo") | `400` |
 | | `mixedSignalsLines` | entero (umbral del nudge fetching+JSX) | `200` |
+| | `overrides` | array de `{ "glob", "maxLines"?, "mixedSignalsLines"? }` (umbral por glob; último match gana) | `[]` |
 | `untranslated-text` | `attributes` | array de nombres de atributo a vigilar | `["placeholder","title","alt","aria-label","label"]` |
 | | `ignore` | array de strings/regex a ignorar | `[]` |
 | `folder-placement` | `placement` | array de `{ "kind", "match" (regex), "allowed" (globs) }` | `[]` |

@@ -8,7 +8,7 @@ import { dirname, join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { isInScope } from '../lib/scope.mjs';
-import { formatFindings } from '../lib/findings.mjs';
+import { formatFindings, summarizeFindings } from '../lib/findings.mjs';
 import { enumerateFiles, buildProjectTree } from '../lib/walk.mjs';
 import { runDetector } from '../hooks/detect.mjs';
 import { PROJECT_RULES, AST_RULES } from '../rules/index.mjs';
@@ -156,11 +156,13 @@ async function runAstRules() {
 
 function report(findings) {
   if (!findings.length) { console.log('praxis-audit: sin findings ✅'); return; }
+  console.log(summarizeFindings(findings) + '\n');
   const byFile = new Map();
   for (const f of findings) {
     if (!byFile.has(f.file)) byFile.set(f.file, []);
     byFile.get(f.file).push(f);
   }
+  console.log('── Detalle ──');
   for (const [file, fs] of byFile) console.log(formatFindings(fs, file) + '\n');
   console.log(`praxis-audit: ${findings.length} finding(s) en ${byFile.size} archivo(s).`);
 }
