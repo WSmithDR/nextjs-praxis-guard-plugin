@@ -90,4 +90,10 @@ console.log('validate-config ast cases ok');
 assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }).ok, false);
 assert.equal(validateConfig({ rules: { 'mi-regla': { enabled: false } } }, ['mi-regla']).ok, true);
 console.log('validate-config extraKnownRules ok');
+// --- respectGitignore ---
+assert.equal(validateConfig({ respectGitignore: true }).ok, true);
+const bad = validateConfig({ respectGitignore: 'yes' });
+assert.equal(bad.ok, false);
+assert.ok(bad.errors.some((e) => e.includes('respectGitignore')), `errors=${bad.errors}`);
+console.log('validate-config respectGitignore ok');
 console.log('validate-config.test ok');

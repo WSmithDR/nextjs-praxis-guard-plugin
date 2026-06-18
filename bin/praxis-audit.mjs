@@ -112,7 +112,7 @@ function runFileRules(relPaths) {
   for (const rel of relPaths) {
     const abs = join(dir, rel);
     let res;
-    try { res = runDetector(abs, { config, customFileRules: custom.fileRules }); } catch { continue; }
+    try { res = runDetector(abs, { config, customFileRules: custom.fileRules, cwd: dir, skipGitignore: true }); } catch { continue; }
     for (const f of res.findings) findings.push({ ...f, file: rel });
   }
   return findings;

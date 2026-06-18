@@ -1,6 +1,7 @@
 {
   "include": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
   "exclude": ["node_modules/", ".next/", "dist/", "build/", ".git/", "coverage/"],
+  "respectGitignore": false,
   "architecture": {
     "strategy": null,
     "root": "src",

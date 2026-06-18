@@ -14,6 +14,7 @@ import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { rulesFingerprint } from '../lib/fingerprint.mjs';
 import { writeMeta } from '../lib/meta.mjs';
 import { RULES, PROJECT_RULES, AST_RULES } from '../rules/index.mjs';
+import { suggestExcludeDirs } from '../lib/exclude-candidates.mjs';
 
 const PLUGIN_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,6 +65,13 @@ if (cmd === 'show') {
   process.exit(0);
 }
 
+if (cmd === 'suggest-excludes') {
+  const cfg = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
+  const candidates = suggestExcludeDirs(dir, cfg);
+  process.stdout.write(JSON.stringify({ candidates }, null, 2) + '\n');
+  process.exit(0);
+}
+
 if (cmd === 'write') {
   const raw = await readStdin();
   let obj;
@@ -88,5 +96,5 @@ if (cmd === 'write') {
   process.exit(0);
 }
 
-console.error('uso: node bin/praxis-config.mjs <show|write> [--dir <proyecto>]');
+console.error('uso: node bin/praxis-config.mjs <show|write|suggest-excludes> [--dir <proyecto>]');
 process.exit(1);
