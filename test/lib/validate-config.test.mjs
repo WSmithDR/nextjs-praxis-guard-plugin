@@ -35,6 +35,11 @@ assert.ok(r.errors.some((e) => /glob/.test(e)), 'override sin glob falla');
 r = validateConfig({ rules: { 'file-responsibility': { overrides: [{ glob: 'x', maxLines: '100' }] } } });
 assert.ok(r.errors.some((e) => /maxLines/.test(e)), 'override.maxLines debe ser número');
 
+// reglas de componentes
+assert.equal(validateConfig({ rules: { 'single-component-per-file': { enabled: true } } }).ok, true);
+assert.equal(validateConfig({ rules: { 'inline-mapped-component': { enabled: true, minTags: 4 } } }).ok, true);
+assert.ok(validateConfig({ rules: { 'inline-mapped-component': { minTags: 'x' } } }).errors.some((e) => /minTags/.test(e)), 'minTags debe ser número');
+
 assert.equal(validateConfig(null).ok, false);
 assert.equal(validateConfig([]).ok, false);
 

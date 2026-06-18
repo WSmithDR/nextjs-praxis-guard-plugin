@@ -3,7 +3,9 @@
 Plugin multi-CLI que vigila buenas praxis en Next.js. Tras cada edición de archivo, un
 linter determinístico revisa el archivo y, si encuentra problemas, te inyecta un aviso
 `praxis-guard` (no bloquea). Reglas de contenido: `secrets`, `hardcoded-data`,
-`forbidden-imports`, `file-responsibility`, `untranslated-text`. Reglas de arquitectura
+`forbidden-imports`, `file-responsibility`, `untranslated-text`, `single-component-per-file`
+(un componente por archivo) e `inline-mapped-component` (sugiere extraer un componente cuando un
+`.map()` renderiza JSX no trivial inline). Reglas de arquitectura
 (opt-in, requieren declarar `architecture.strategy`): `folder-placement`, `layer-boundaries`,
 `server-client-boundaries`, `feature-deps` (por-archivo) y `architecture-coherence` (solo
 auditoría). Reglas TypeScript (autodetect si hay `tsconfig.json`; aprovechamiento de tipos, no
