@@ -6,6 +6,7 @@ import fileResponsibility from './file-responsibility.mjs';
 import untranslatedText from './untranslated-text.mjs';
 import singleComponentPerFile from './single-component-per-file.mjs';
 import inlineMappedComponent from './inline-mapped-component.mjs';
+import descriptiveComponentNames from './descriptive-component-names.mjs';
 import thinRoutePages from './thin-route-pages.mjs';
 import tailwindContentCoverage from './tailwind-content-coverage.mjs';
 import folderPlacement from './folder-placement.mjs';
@@ -43,6 +44,7 @@ export const RULES = {
   'untranslated-text': untranslatedText,
   'single-component-per-file': singleComponentPerFile,
   'inline-mapped-component': inlineMappedComponent,
+  'descriptive-component-names': descriptiveComponentNames,
   'thin-route-pages': thinRoutePages,
   'folder-placement': folderPlacement,
   'layer-boundaries': layerBoundaries,

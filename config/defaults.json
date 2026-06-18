@@ -17,6 +17,7 @@
     "untranslated-text": { "enabled": true, "attributes": ["placeholder", "title", "alt", "aria-label", "label"], "ignore": [] },
     "single-component-per-file": { "enabled": true, "ignore": ["**/*.stories.tsx", "**/*.stories.jsx", "**/*.test.tsx", "**/*.test.jsx", "**/*.spec.tsx", "**/*.spec.jsx"] },
     "inline-mapped-component": { "enabled": true, "minTags": 3 },
+    "descriptive-component-names": { "enabled": true, "blocklist": ["Card", "Item", "Box", "Wrapper", "Data", "Component", "Thing", "El", "Comp"], "allow": [] },
     "thin-route-pages": { "enabled": false, "maxLines": 30, "maxStructuralTags": 2 },
     "folder-placement": { "enabled": false, "placement": [] },
     "architecture-coherence": { "enabled": false },
