@@ -23,6 +23,18 @@ assert.ok(r.errors.some((e) => /module/.test(e)));
 
 assert.equal(validateConfig({ rules: { 'untranslated-text': { ignore: 'Enviar' } } }).ok, false);
 
+// forbidden-imports allowDirs
+assert.equal(validateConfig({ rules: { 'forbidden-imports': { list: [{ module: 'framer-motion', allowDirs: ['lib/motion'] }] } } }).ok, true);
+r = validateConfig({ rules: { 'forbidden-imports': { list: [{ module: 'x', allowDirs: 'lib/x' }] } } });
+assert.ok(r.errors.some((e) => /allowDirs/.test(e)), 'allowDirs debe ser array');
+
+// file-responsibility overrides
+assert.equal(validateConfig({ rules: { 'file-responsibility': { overrides: [{ glob: '**/lib/**', maxLines: 100 }] } } }).ok, true);
+r = validateConfig({ rules: { 'file-responsibility': { overrides: [{ maxLines: 100 }] } } });
+assert.ok(r.errors.some((e) => /glob/.test(e)), 'override sin glob falla');
+r = validateConfig({ rules: { 'file-responsibility': { overrides: [{ glob: 'x', maxLines: '100' }] } } });
+assert.ok(r.errors.some((e) => /maxLines/.test(e)), 'override.maxLines debe ser número');
+
 assert.equal(validateConfig(null).ok, false);
 assert.equal(validateConfig([]).ok, false);
 

@@ -12,6 +12,11 @@ export default function folderPlacement(content, filePath, config = {}, full = {
   if (placement.length === 0) return [];
 
   const path = String(filePath).replace(/\\/g, '/');
+  // Next route groups `(group)` son transparentes a la URL: app/(marketing)/about
+  // es semánticamente app/about. Matcheamos contra el path real y el colapsado, así
+  // un `allowed` canónico (app/about/**) acepta el archivo aunque esté bajo un grupo.
+  // Solo colapsa `(parens)`; @slots y [dynamic] SÍ son segmentos reales de URL.
+  const collapsed = path.split('/').filter((s) => !/^\(.+\)$/.test(s)).join('/');
   const base = basename(path);
   const out = [];
   for (const entry of placement) {
@@ -20,7 +25,7 @@ export default function folderPlacement(content, filePath, config = {}, full = {
     try { re = new RegExp(entry.match); } catch { continue; }
     const applies = re.test(base) || re.test(content);
     if (!applies) continue;
-    const ok = entry.allowed.some((g) => matchGlob(path, g));
+    const ok = entry.allowed.some((g) => matchGlob(path, g) || matchGlob(collapsed, g));
     if (!ok) {
       out.push({ rule: 'folder-placement', severity: 'warn',
         message: `Archivo de tipo "${entry.kind}" fuera de lugar: debería estar en ${entry.allowed.join(' | ')}.` });
