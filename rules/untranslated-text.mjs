@@ -9,6 +9,10 @@
 // plain variable assignments (`const title = "x"` has spaces around `=`).
 const WORD = /[A-Za-zÀ-ÖØ-öø-ÿ]{2,}/; // at least one 2+ letter word (accents included)
 const TEXT_NODE = />([^<>{}]+)</g;
+// ponytail: heuristic guard, not a JSX parser. A TS generic close `>` (useState<T>(...))
+// makes TEXT_NODE capture code as if it were JSX text. Real UI text carries none of these
+// code tokens; if precision ever needs more, swap to a real JSX parse. Upgrade path noted.
+const CODE_HINT = /[[\]=;]|=>|\b(const|let|var|function|return|new|await|typeof|import|export)\b|\buse[A-Z]/;
 const DEFAULT_ATTRS = ['placeholder', 'title', 'alt', 'aria-label', 'label'];
 
 function clip(s) {
@@ -30,7 +34,7 @@ export default function untranslatedText(content, filePath, config = {}) {
   let m;
   while ((m = TEXT_NODE.exec(content)) !== null) {
     const text = m[1].trim();
-    if (!text || !WORD.test(text) || isIgnored(text)) continue;
+    if (!text || !WORD.test(text) || isIgnored(text) || CODE_HINT.test(text)) continue;
     out.push({
       rule: 'untranslated-text', line: lineOf(m.index), severity: 'warn',
       message: `Texto literal "${clip(text)}" en JSX sin interpolar. Pasalo por una función i18n (ej. {t('clave')}) para soportar multidioma.`,

@@ -8,6 +8,7 @@ import { dirname, join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { loadConfig, defaultProjectConfigPath } from '../lib/config.mjs';
 import { isInScope } from '../lib/scope.mjs';
+import { matchGlob } from '../lib/glob.mjs';
 import { formatFindings, summarizeFindings } from '../lib/findings.mjs';
 import { enumerateFiles, buildProjectTree } from '../lib/walk.mjs';
 import { runDetector } from '../hooks/detect.mjs';
@@ -33,6 +34,25 @@ function arg(name, def) {
 }
 
 const dir = resolve(arg('dir', process.cwd()));
+
+// --path <subdir|glob> (repetible): acota la auditoría a esos prefijos/globs. El resumen se
+// recomputa solo sobre lo que queda en scope, porque filtramos tanto los archivos de entrada
+// como los findings (incluidos los de project rules) por este matcher.
+const pathScopes = [];
+for (let i = 0; i < process.argv.length; i++) {
+  const a = process.argv[i];
+  if (a.startsWith('--path=')) pathScopes.push(a.slice('--path='.length));
+  else if (a === '--path' && process.argv[i + 1] && !process.argv[i + 1].startsWith('--')) pathScopes.push(process.argv[++i]);
+}
+function inPathScope(rel) {
+  if (!pathScopes.length) return true;
+  const n = String(rel).replace(/\\/g, '/');
+  return pathScopes.some((p) => {
+    const pre = p.replace(/\/$/, '');
+    return n === pre || n.startsWith(pre + '/') || matchGlob(n, p);
+  });
+}
+
 const config = loadConfig({ projectConfigPath: defaultProjectConfigPath(dir) });
 try { config.detected = detectStack(dir); } catch { config.detected = { typescript: false, tailwind: false, tailwindConfigPath: null, tsconfigOptions: null, tsconfigFixable: false }; }
 
@@ -191,7 +211,7 @@ if (mode === 'incremental' && targets == null) mode = 'full';   // degradación 
 let findings;
 let ranProject = false;
 if (mode === 'full') {
-  const files = enumerateFiles(dir, config);
+  const files = enumerateFiles(dir, config).filter(inPathScope);
   findings = [...runFileRules(files), ...runProjectRules()];
   ranProject = true;
 } else if (mode === 'staged') {
@@ -207,6 +227,10 @@ if (deep || (mode === 'full' && anyAstRunsOnFull())) {
   findings = [...findings, ...await runAstRules()];
 }
 
+// --path: recortar findings al scope (incluye los de project/AST rules emitidos sobre archivos
+// en scope; descarta los de nivel proyecto '(proyecto)' cuando se acotó a un subdir).
+if (pathScopes.length) findings = findings.filter((f) => inPathScope(f.file));
+
 const baseline = process.argv.includes('--no-baseline') ? null : readBaseline(dir);
 const { shown, suppressed, resolvedCount } = applyBaseline(findings, baseline);
 
@@ -215,7 +239,7 @@ if (format === 'sarif') {
 } else {
   report(shown);
 }
-const modeStr = `modo ${mode}${ranProject ? ' (con project rules)' : ''}`;
+const modeStr = `modo ${mode}${ranProject ? ' (con project rules)' : ''}${pathScopes.length ? ` · scope: ${pathScopes.join(', ')}` : ''}`;
 if (baseline) {
   note(`praxis-audit: ${shown.length} nuevo(s), ${suppressed.length} ocultos por baseline. ${modeStr}.`);
   if (mode === 'full' && resolvedCount > 0) {

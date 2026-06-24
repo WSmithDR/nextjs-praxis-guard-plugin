@@ -14,6 +14,10 @@ Motor determinista: `bin/praxis-audit.mjs`. Esta skill solo lo invoca y presenta
   - Incremental (git diff desde `last_audited_commit`) en caso contrario.
 - Forzar completa: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --full --dir <proyecto>`
 - Desde un ref: `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --since <ref> --dir <proyecto>`
+- Acotar a un subdir/glob: `--path <subdir|glob>` (repetible). Restringe los archivos auditados a ese
+  prefijo/glob e intersecta con el modo (full/incremental/staged); el resumen se recomputa solo sobre
+  ese scope. Ideal para "acabo de refactorizar X, auditá SOLO X" sin el ruido repo-wide. Combinable con
+  `--deep` y `--format sarif`. Ej: `--full --path features/stratix-mkt --deep --dir <proyecto>`.
 - Pre-commit (lo usa el hook git): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --staged --dir <proyecto>`
 - Arreglar tsconfig (opt-in): `node ${CLAUDE_PLUGIN_ROOT}/bin/praxis-audit.mjs --fix-tsconfig --dir <proyecto>`
   - Aplica el `baseline` de `tsconfig-strictness` a `compilerOptions`. Solo escribe si el
@@ -53,6 +57,24 @@ proyecto tiene `tsconfig.json` y nunca se corrió la profunda, destacá la opci�
    (`architecture.strategy`), sugerir la skill `praxis-config`.
 5. Si el audit avisa que hay findings de la baseline ya resueltos, sugerí `--update-baseline`
    para limpiarlos (evita que una regresión futura quede oculta por una huella huérfana).
+
+## Patrones a sugerir en la revisión
+
+Más allá de los findings deterministas del motor, al presentar el reporte (paso 3) mirá si algún
+archivo cae en estos patrones recurrentes y sugerí el refactor (es guía para el agente, no un finding
+del motor):
+
+- **Wizard/form multipaso inline:** componente con estado de paso (`const [step, setStep] = useState(0)`
+  o enum) y ≥2 ramas `step === N &&` / `switch(step)` cuyos cuerpos superan ~10 líneas de JSX. Sugerí:
+  (1) extraer cada paso a su propio step-component presentacional (un archivo c/u); (2) dejar el padre
+  como shell (estado del wizard + handlers de transición + submit); (3) reemplazar la cadena de
+  condicionales por un array de elementos renderizado por índice `{steps[step]}`. (Suele aparecer junto
+  a `file-responsibility` por largo, pero el conteo de líneas no guía el patrón correcto.)
+- **Array/objeto literal inline como prop:** `prop={[...]}` / `prop={{...}}` con más de ~2 elementos o
+  multilínea. Sugerí extraerlo: (1) si depende de estado/props/computados → `const <nombre> = [...]`
+  arriba del return y `prop={<nombre>}`; (2) si es estático → moverlo a `constants.ts` y referenciarlo.
+  Nombrar el dato (kpis, steps, headers) separa "qué datos" de "cómo se renderiza". Excepciones: literales
+  triviales de 1-2 ítems, callbacks/estilos puntuales.
 
 ## Estado
 
