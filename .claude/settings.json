@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "todo-plugin@todo-plugin": true
+    "todo-plugin@todo-plugin": true,
+    "nextjs-praxis-guard@nextjs-praxis-guard": true
   }
 }

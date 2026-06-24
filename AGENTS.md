@@ -34,8 +34,11 @@ auditoría (file+project), con el mismo contrato que las built-in. Se configuran
 Si ves un aviso de `praxis-guard`, corregí el problema en el flujo antes de continuar.
 
 ## Soporte por CLI
-- Claude Code: hook `PostToolUse` (bundled `hooks/hooks.json`).
-- Gemini CLI: hook `AfterTool` (bundled). Ojo: transición a Antigravity CLI (2026-06-18).
+- Claude Code: hooks `SessionStart` + `PostToolUse` (bundled `hooks/hooks.json`). El loader de
+  Claude valida estricto las keys de evento → `hooks/hooks.json` es **solo de Claude** (no metas
+  keys de otros CLIs ahí, las rechaza y rompe la carga del plugin).
+- Gemini CLI: hook `AfterTool` (`cli/gemini-hooks.json`). Sacado del `hooks/hooks.json` bundled
+  porque Claude rechaza la key `AfterTool`. Ojo: transición a Antigravity CLI (2026-06-18).
 - Codex CLI: hook `PostToolUse` (`cli/codex-hooks.json` → `.codex/`).
 - Copilot CLI: hook `postToolUse` (`cli/copilot-hooks.json` → `.github/hooks/`).
 - OpenCode: plugin `tool.execute.after` (`cli/opencode-plugin.mjs` → `.opencode/plugins/`).

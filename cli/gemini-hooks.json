@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "AfterTool": [
+      {
+        "matcher": "write_file|replace",
+        "hooks": [
+          { "name": "praxis-guard", "type": "command", "timeout": 10000,
+            "command": "node \"$(git rev-parse --show-toplevel)/hooks/hook-adapter.mjs\" --cli=gemini" }
+        ]
+      }
+    ]
+  }
+}
